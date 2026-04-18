@@ -1,0 +1,23 @@
+Tech
+- Svelte5
+- shadcn-svelte
+- connectRPC
+npm install -D @bufbuild/buf
+npm install @bufbuild/protobuf
+
+struktur
+
+
+src/lib/
+├── gen/                <-- Kontrak Data (Generated Types dari gRPC/REST)
+├── shared/
+│   ├── api/            <-- Konfigurasi Global (Fetch wrapper / ConnectRPC Transport)
+│   └── components/     <-- Shadcn UI (Atomic Components)
+└── features/
+    └── user/
+        ├── api/        <-- "Kabel" spesifik fitur (ConnectRPC Client / Fetch Call)
+        │   ├── grpc-client.ts    <-- Jika pakai gRPC
+        │   ├── rest-client.ts    <-- Jika pakai REST (Fetch/Axios)
+        │   └── index.ts          <-- Pintu keluar (Export salah satu)
+        ├── components/ <-- UI spesifik fitur (UserTable, UserForm)
+        └── stores/     <-- Logika reaktif Svelte 5 (UserStore.svelte.ts)

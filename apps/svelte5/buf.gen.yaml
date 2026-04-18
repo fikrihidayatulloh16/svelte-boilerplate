@@ -1,0 +1,11 @@
+version: v2
+plugins:
+  # Plugin untuk Protobuf Messages
+  - remote: buf.build/bufbuild/es:v2.11.0
+    out: src/lib/gen
+    opt: target=ts
+
+  # Plugin untuk Connect RPC
+  - remote: buf.build/connectrpc/es:v1.6.1
+    out: src/lib/gen
+    opt: target=ts

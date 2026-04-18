@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+package-lock.json
+# (Beberapa orang memilih men-commit lock file, tapi untuk boilerplate 
+# yang sering di-clone, terkadang sengaja diabaikan agar user install versi terbaru)
+
+# Output & Build
+.output/
+.vercel/
+.netlify/
+.wrangler/
+.svelte-kit/
+build/
+dist/
+
+# gRPC / Buf (Generated Code)
+# Berdasarkan diskusi kita, kita abaikan folder gen agar repo tetap ringan.
+# Setiap user yang clone wajib menjalankan 'npx buf generate'.
+src/lib/gen/
+.buf/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.local
+
+# Env & Secrets
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite & Tooling
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+eslint.config.js.timestamp-*
+
+# Testing & Coverage
+/test-results/
+/coverage/
+/.nyc_output/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor (Optional but recommended)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
