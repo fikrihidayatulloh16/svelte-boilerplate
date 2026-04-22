@@ -28,9 +28,20 @@ export const userMock = (router: ConnectRouter) => {
             updatedAt: new Date().toISOString(),
             avatarUrl: "",
             role: "admin",
+          },
+          { 
+            id: "3", 
+            fullName: "SuperAdmin", 
+            email: "superadmin@example.com",
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            avatarUrl: "",
+            role: "superadmin",
+            hash_password: "superadmin",
           }
         ],
-        totalCount: 2
+        totalCount: 3
       };
     }
   });

@@ -2,8 +2,6 @@ Tech
 - Svelte5
 - shadcn-svelte
 - connectRPC
-npm install -D @bufbuild/buf
-npm install @bufbuild/protobuf
 
 struktur
 
@@ -21,3 +19,109 @@ src/lib/
         │   └── index.ts          <-- Pintu keluar (Export salah satu)
         ├── components/ <-- UI spesifik fitur (UserTable, UserForm)
         └── stores/     <-- Logika reaktif Svelte 5 (UserStore.svelte.ts)
+
+
+================ boilerplate feature core ===============
+
+Agar Anda bisa langsung tancap gas ke proses bisnis (misal: fitur e-commerce, sistem sekolah, atau B2B), berikut adalah komponen wajib yang harus ada di boilerplate Anda selain gRPC:
+
+1. Authentication Interceptors (The "Heart")
+Di gRPC, kita tidak memakai axios.interceptors. Kita memakai Connect Interceptors.
+Mengapa wajib? Anda tidak mau menulis kode untuk mengambil token dari localStorage dan menaruhnya di header di setiap fungsi API.
+
+Logic: Otomatis menyisipkan Authorization: Bearer <token> ke setiap request.
+
+Logic: Menangani error 401 (Unauthenticated) secara global untuk memaksa user logout atau refresh token.
+
+2. Global Feedback System (Toasts & Loading Bar)
+Jangan biarkan user menebak apakah aplikasi sedang bekerja atau error.
+
+Sonner (Toasts): Integrasikan gRPC error codes ke dalam Toast. Jika backend mengirim error PERMISSION_DENIED, aplikasi otomatis memunculkan pesan merah "Anda tidak punya akses".
+
+NProgress: Indikator loading di bagian atas layar saat navigasi antar halaman atau saat request gRPC sedang berjalan.
+
+3. Form Handling & Validation (The "Muscle")
+Bisnis itu 80% adalah mengisi form.
+
+Zod Integration: Karena gRPC sudah memberi tipe data, Anda tinggal menyambungkannya dengan Zod untuk validasi di sisi klien.
+
+Svelte-Forms-Lib / Superforms: Mengelola state input (dirty, touched, error) agar Anda tidak membuat variabel $state manual untuk setiap kolom input.
+
+4. Theme & Layout Engine
+Dark Mode: Pasang svelte-themes. Di tahun 2026, dark mode bukan fitur bonus, tapi kewajiban.
+
+Responsive Sidebar/Navbar: Buat komponen shell aplikasi yang sudah siap dengan slot untuk profil user dan menu navigasi.
+
+5. Deployment & Dev-Environment Consistency
+Docker & Docker Compose: Karena Anda suka self-hosting di Proxmox, boilerplate Anda harus punya Dockerfile yang sudah dioptimasi untuk SvelteKit (Node.js adapter) agar sekali push, langsung jalan di server.
+
+Environment Manager: Skema .env.example yang jelas untuk memisahkan URL gRPC backend (Local vs Production).
+
+Komponen,Status,Mengapa Penting?
+gRPC Mocking,✅ Aman,Bisa ngoding tanpa nunggu backend jadi.
+Interceptors,❌ Belum,Agar tidak perlu urus token manual di setiap fitur.
+Global Error Handler,❌ Belum,Agar error gRPC tidak membuat aplikasi crash.
+Zod Schema,❌ Belum,Validasi input user sebelum dikirim ke backend.
+Dark/Light Mode,❌ Belum,Kenyamanan visual standar industri.
+
+==============================================================================
+
+===================perlu disesuaikan===========================
+
+###################################
+// apps/svelte5/src/hooks.server.ts
+
+if (token) {
+        // --- BAYANGKAN LOGIKA INI NANTINYA ---
+        // const grpcResponse = await userClient.getProfile({ token });
+        // ATAU
+        // const restResponse = await fetch('/api/profile').then(r => r.json());
+
+        // --- UNTUK SEKARANG (MOCKING) ---
+        // Kita masukkan objek murni biasa. Bebas tambah properti apa saja!
+        event.locals.user = {
+            id: '1',
+            fullName: 'Fikri Hidayatulloh',
+            role: 'admin',      // <-- Tidak akan error lagi!
+            email: 'fikri@example.com'
+        };
+    } else {
+        event.locals.user = null;
+    }
+
+######################################
+// apps/svelte5/src/hooks.server.ts
+
+const authHandler: Handle = async ({ event, resolve }) => {
+    const token = event.cookies.get('session_token');
+
+    if (token) {
+        // --- BAYANGKAN LOGIKA INI NANTINYA ---
+        // const grpcResponse = await userClient.getProfile({ token });
+        // ATAU
+        // const restResponse = await fetch('/api/profile').then(r => r.json());
+
+        // --- UNTUK SEKARANG (MOCKING) ---
+        // Kita masukkan objek murni biasa. Bebas tambah properti apa saja!
+        event.locals.user = {
+            id: '1',
+            fullName: 'Fikri Hidayatulloh',
+            role: 'admin',      // <-- Tidak akan error lagi!
+            email: 'fikri@example.com'
+        };
+    } else {
+        event.locals.user = null;
+    }
+
+    return resolve(event);
+};
+
+####################################
+
+################################
+// apps/svelte5/src/lib/shared/api/transport.ts
+
+// Ganti ke 'false' nanti jika Backend Nginx/Go/NestJS Anda sudah siap
+const USE_MOCK = true; 
+
+#################################

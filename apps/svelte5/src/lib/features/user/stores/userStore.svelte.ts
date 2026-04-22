@@ -1,4 +1,4 @@
-import { userClient } from "../api/client";
+import { userClient } from "../api/grpcClient";
 import type { User } from "$lib/gen/proto/user_pb";
 
 export function createUserStore() {

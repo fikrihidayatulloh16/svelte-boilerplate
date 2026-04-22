@@ -1,9 +1,14 @@
+<!-- apps/svelte5/src/lib/features/user/components/userTable.svelte -->
 <script lang="ts">
     import * as Table from "$lib/components/ui/table";
     import { Badge } from "$lib/components/ui/badge";
-    
-    // Kita terima store sebagai prop
-    let { store } = $props();
+    import type { User } from "$lib/gen/proto/user_pb";
+
+    // Kita terima data langsung sebagai props, bukan store
+    let { users = [], isLoading = false } = $props<{ 
+        users: User[], 
+        isLoading: boolean 
+    }>();
 </script>
 
 <div class="rounded-md border">
@@ -17,16 +22,16 @@
             </Table.Row>
         </Table.Header>
         <Table.Body>
-            {#if store.isLoading}
+            {#if isLoading}
                 <Table.Row>
                     <Table.Cell colspan={4} class="text-center">Memuat data...</Table.Cell>
                 </Table.Row>
-            {:else if store.users.length === 0}
+            {:else if users.length === 0}
                 <Table.Row>
                     <Table.Cell colspan={4} class="text-center">Tidak ada data.</Table.Cell>
                 </Table.Row>
             {:else}
-                {#each store.users as user}
+                {#each users as user}
                     <Table.Row>
                         <Table.Cell class="font-medium">{user.fullName}</Table.Cell>
                         <Table.Cell>{user.email}</Table.Cell>
