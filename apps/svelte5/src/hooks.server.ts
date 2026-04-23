@@ -23,16 +23,17 @@ const authHandler: Handle = async ({ event, resolve }) => {
         event.locals.user = null;
     }
 
-    // // --- PROTEKSI RUTE (Pintu Gerbang) ---
-    // const isAccessingDashboard = event.url.pathname.startsWith('/dashboard');
-    
-    // // Jika mencoba masuk dashboard tapi tidak ada user di Locals
-    // if (isAccessingDashboard && !event.locals.user) {
-    //     // Gunakan 303 untuk redirect setelah pengecekan server
-    //     throw redirect(303, '/auth/login');
-    // }
+    const response = await resolve(event);
 
-    return resolve(event);
+    // Suntikkan keamanan tambahan di Header Response
+    response.headers.set('X-Frame-Options', 'DENY'); // Cegah Clickjacking
+    response.headers.set('X-Content-Type-Options', 'nosniff'); // Cegah MIME sniffing
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Opsional: Jika ingin sangat ketat (CSP)
+    // response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline';");
+
+    return response;
 };
 
 export const handle = sequence(authHandler);

@@ -59,7 +59,7 @@ Environment Manager: Skema .env.example yang jelas untuk memisahkan URL gRPC bac
 
 Komponen,Status,Mengapa Penting?
 gRPC Mocking,✅ Aman,Bisa ngoding tanpa nunggu backend jadi.
-Interceptors,✅ Belum,Agar tidak perlu urus token manual di setiap fitur.
+Interceptors,✅ sudah,Agar tidak perlu urus token manual di setiap fitur.
 Global Error Handler,❌ Belum,Agar error gRPC tidak membuat aplikasi crash.
 Zod Schema,❌ Belum,Validasi input user sebelum dikirim ke backend.
 Dark/Light Mode,❌ Belum,Kenyamanan visual standar industri.
@@ -125,3 +125,124 @@ const authHandler: Handle = async ({ event, resolve }) => {
 const USE_MOCK = true; 
 
 #################################
+
+################################
+// apps/svelte5/src/routes/auth/login/+page.server.ts
+export const actions = {
+    login: async ({ request, cookies }) => {
+        const data = await request.formData();
+        const email = data.get('email');
+        const password = data.get('password');
+
+        // --- MOCK LOGIC: Pura-pura validasi ke Backend ---
+        // Jika di dunia nyata, di sini Anda melakukan:
+        // const res = await fetch('http://api.fikri.com/login', { ... })
+
+        //  SESUAIKAN APAKAH TOKEN ATAU COOKIE
+
+        // const token = res.json().token;
+
+        if (email === 'admin@example.com' && password === 'admin123') {
+            // Berhasil login! Kita tanam Cookie session_token
+            cookies.set('session_token', 'mock-jwt-token-xyz-789', {
+                path: '/',
+                httpOnly: true, // Tidak bisa dibaca XSS hacker
+                sameSite: 'strict',
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 60 * 60 * 24 // 1 Hari
+            });
+
+            // Redirect ke halaman terproteksi
+            throw redirect(303, '/dashboard');
+        }
+
+        // Jika gagal login
+        return fail(401, { error: 'Email atau password salah!' });
+    }
+} satisfies Actions;
+
+#################################
+
+==============================================================================
+
+===================perlu diuji===========================
+
+- apakah bisa memakai backend apapun tanpa banyak Konfigurasi
+
+- apakah keamanan komunikasi data, seperti aman dari httpcanary
+
+==============================================================================
+
+==================   vulnerabilities    s===========================
+
+Risk=High, Confidence=Low (1)
+
+http://localhost:5173 (1)
+
+Path Traversal (1)
+
+GET http://localhost:5173/node_modules/.vite/deps/clsx.js?v=%2Fclsx.js
+
+
+
+Risk=Medium, Confidence=High (1)
+
+http://localhost:5173 (1)
+
+Content Security Policy (CSP) Header Not Set (1)
+
+GET http://localhost:5173/auth/login
+
+
+
+Risk=Medium, Confidence=Medium (2)
+
+http://localhost:5173 (1)
+
+Missing Anti-clickjacking Header (1)
+
+GET http://localhost:5173/auth/login
+
+
+
+Risk=Medium, Confidence=Low (1)
+
+http://localhost:5173 (1)
+
+Absence of Anti-CSRF Tokens (1)
+
+GET http://localhost:5173/auth/login
+
+
+
+Risk=Informational, Confidence=Medium (12)
+
+http://localhost:5173 (4)
+
+Information Disclosure - Sensitive Information in URL (1)
+
+GET http://localhost:5173/?token=NQfSZDhvxXUa
+
+Modern Web Application (1)
+
+GET http://localhost:5173/auth/login
+
+Tech Detected - Tailwind CSS (1)
+
+GET http://localhost:5173/auth/login
+
+User Agent Fuzzer (1)
+
+GET http://localhost:5173/.svelte-kit/generated/client/nodes/0.js?t=1776911406965
+
+
+
+Risk=Informational, Confidence=Low (2)
+
+http://localhost:5173 (1)
+
+Information Disclosure - Suspicious Comments (1)
+
+GET http://localhost:5173/node_modules/@sveltejs/kit/src/exports/internal/index.js?v=ff0da96a
+
+==============================================================================

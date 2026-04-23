@@ -1,3 +1,4 @@
+// apps/svelte5/src/routes/auth/login/+page.server.ts
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
@@ -10,6 +11,9 @@ export const actions = {
         // --- MOCK LOGIC: Pura-pura validasi ke Backend ---
         // Jika di dunia nyata, di sini Anda melakukan:
         // const res = await fetch('http://api.fikri.com/login', { ... })
+
+        //  SESUAIKAN APAKAH TOKEN ATAU COOKIE
+
         // const token = res.json().token;
 
         if (email === 'admin@example.com' && password === 'admin123') {
