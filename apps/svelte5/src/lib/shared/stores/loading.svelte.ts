@@ -37,24 +37,28 @@ class LoadingStore {
 
     done() {
         untrack(() => {
-            this._activeRequests = Math.max(0, this._activeRequests - 1);
-            if (this._activeRequests === 0) {
-                // 1. Loncat ke 100% (Kejujuran Visual)
+            // Jika ini adalah request terakhir yang selesai
+            if (this._activeRequests === 1) {
+                // 1. Loncat ke 100% SEBELUM mematikan status loading
                 this.progress = 100;
-                
-                // 2. Bersihkan semua timer
+
+                // 2. Bersihkan semua timer simulasi
                 clearInterval(this._interval);
                 clearTimeout(this._slowTimer);
 
-                // 3. Beri jeda 500ms agar mata manusia sempat melihat angka 100%
+                // 3. Beri jeda 500ms (atau lebih) agar user puas melihat 100%
                 setTimeout(() => {
                     untrack(() => {
-                        if (this._activeRequests === 0) {
-                            this.progress = 0;
-                            this.isSlow = false;
-                        }
+                        // 4. BARU SEKARANG kita matikan status loading
+                        // Ini akan memicu {#if} di UI menghilang
+                        this._activeRequests = 0; 
+                        this.progress = 0;
+                        this.isSlow = false;
                     });
-                }, 500);
+                }, 100); // Saya naikkan sedikit ke 700ms agar lebih mantap
+            } else {
+                // Jika masih ada request lain yang berjalan, kurangi saja seperti biasa
+                this._activeRequests = Math.max(0, this._activeRequests - 1);
             }
         });
     }

@@ -22,7 +22,7 @@
                     <circle cx={center} cy={center} r={radius} stroke="currentColor" stroke-width={stroke} fill="transparent" class="text-gray-200" />
                     <circle cx={center} cy={center} r={radius} stroke="currentColor" stroke-width={stroke} fill="transparent"
                         stroke-dasharray={circumference}
-                        style="stroke-dashoffset: {dashoffset}; transition: stroke-dashoffset 0.3s ease;"
+                        style="stroke-dashoffset: {dashoffset}; transition: stroke-dashoffset 0.3s cubic-bezier(0.3, 0, 0.2, 1);"
                         stroke-linecap="round" class="text-blue-600" />
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center font-mono">
