@@ -1,3 +1,4 @@
+// apps/svelte5/src/lib/shared/stores/loading.svelte.ts
 import { untrack } from 'svelte';
 
 class LoadingStore {
@@ -32,7 +33,7 @@ class LoadingStore {
                     this.progress += increment;
                 }
             });
-        }, 300);
+        }, 100);
     }
 
     done() {

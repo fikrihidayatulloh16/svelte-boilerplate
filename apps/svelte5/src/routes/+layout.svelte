@@ -10,21 +10,17 @@
     import { loadingStore } from '$lib/shared/stores/loading.svelte';
     import LoadingBar from '$lib/components/ui/LoadingBar.svelte';
     import LoadingCircle from '$lib/components/ui/LoadingCircle.svelte';
-    import { beforeNavigate, afterNavigate } from '$app/navigation'; 
+    // import { beforeNavigate, afterNavigate } from '$app/navigation'; 
     import { untrack } from 'svelte';
+    import { navigating } from '$app/state';
 
 	let { data, children } = $props<{ data: LayoutData, children: any }>();
 
-    beforeNavigate(() => {
-        loadingStore.start();
-    });
-
-    afterNavigate(() => {
-        loadingStore.done();
-    });
+    let isNavigatingLock = false;
 
 	// Svelte 5: Sinkronisasi data server ke client side store
     // Ini memastikan authStore.user terisi saat halaman pertama kali dimuat (SSR)
+    // 1. Radar Khusus Auth (Memantau data.user)
     $effect(() => {
         const currentUser = data.user;
 
@@ -33,6 +29,25 @@
                 authStore.setSession(currentUser);
             } else {
                 authStore.clearSession();
+            }
+        });
+    });
+
+    // 2. Radar Khusus Loading Navigasi (Memantau $app/state navigating)
+    $effect(() => {
+        // BACA state navigasi
+        const isNavigating = !!(navigating?.to || navigating?.from);
+
+        untrack(() => {
+            // EKSEKUSI: Hanya jalankan start() jika gembok terbuka (false)
+            if (isNavigating && !isNavigatingLock) {
+                isNavigatingLock = true; // Kunci gembok
+                loadingStore.start();
+            } 
+            // Hanya jalankan done() jika gembok sedang terkunci (true)
+            else if (!isNavigating && isNavigatingLock) {
+                isNavigatingLock = false; // Buka gembok
+                loadingStore.done();
             }
         });
     });
