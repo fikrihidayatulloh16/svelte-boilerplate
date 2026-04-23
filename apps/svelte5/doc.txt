@@ -163,6 +163,25 @@ export const actions = {
 
 #################################
 
+#################################
+
+3. Sparring Intelektual: Bagaimana "Membatalkan" Secara Nyata?
+Tombol "Batalkan" di atas saat ini baru membersihkan UI. Namun, di balik layar, request API (REST/gRPC) atau Navigasi SvelteKit mungkin masih berjalan. Agar boilerplate Anda benar-benar tangguh, Anda perlu memahami konsep AbortController.
+
+Untuk Request API:
+Anda harus mengirimkan AbortSignal ke fungsi fetch atau gRPC Anda.
+
+// Contoh implementasi di logic Anda
+const controller = new AbortController();
+
+// Di LoadingStore.cancelAll()
+controller.abort(); 
+
+// Di API Call
+const response = await fetch('/api/data', { signal: controller.signal });
+
+##########################
+
 ==============================================================================
 
 ===================perlu diuji===========================
