@@ -7,9 +7,9 @@
 	import type { LayoutData } from './$types'; // Import tipe otomatis SvelteKit
 	import { onMount } from 'svelte';
     import { Toaster, toast } from 'svelte-sonner'; // Asumsi Anda pakai library toast populer
-    import { navigating } from '$app/state';
     import { loadingStore } from '$lib/shared/stores/loading.svelte';
     import LoadingBar from '$lib/components/ui/LoadingBar.svelte';
+    import LoadingCircle from '$lib/components/ui/LoadingCircle.svelte';
     import { beforeNavigate, afterNavigate } from '$app/navigation'; 
     import { untrack } from 'svelte';
 
@@ -54,6 +54,9 @@
 </script>
 
 <Toaster richColors position="bottom-right" />
+
+<!-- <LoadingBar /> -->
+ <LoadingCircle />
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <QueryClientProvider client={queryClient}>

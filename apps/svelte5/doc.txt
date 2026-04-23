@@ -38,7 +38,7 @@ Jangan biarkan user menebak apakah aplikasi sedang bekerja atau error.
 
 Sonner (Toasts)✅: Integrasikan gRPC error codes ke dalam Toast. Jika backend mengirim error PERMISSION_DENIED, aplikasi otomatis memunculkan pesan merah "Anda tidak punya akses".
 
-NProgress: Indikator loading di bagian atas layar saat navigasi antar halaman atau saat request gRPC sedang berjalan.
+NProgress v1.0✅: Indikator loading di bagian atas layar saat navigasi antar halaman atau saat request gRPC sedang berjalan.
 
 3. Form Handling & Validation (The "Muscle")
 Bisnis itu 80% adalah mengisi form.
