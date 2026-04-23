@@ -25,7 +25,7 @@ src/lib/
 
 Agar Anda bisa langsung tancap gas ke proses bisnis (misal: fitur e-commerce, sistem sekolah, atau B2B), berikut adalah komponen wajib yang harus ada di boilerplate Anda selain gRPC:
 
-1. Authentication Interceptors (The "Heart")
+1. Authentication Interceptors (The "Heart") ✅
 Di gRPC, kita tidak memakai axios.interceptors. Kita memakai Connect Interceptors.
 Mengapa wajib? Anda tidak mau menulis kode untuk mengambil token dari localStorage dan menaruhnya di header di setiap fungsi API.
 
@@ -36,7 +36,7 @@ Logic: Menangani error 401 (Unauthenticated) secara global untuk memaksa user lo
 2. Global Feedback System (Toasts & Loading Bar)
 Jangan biarkan user menebak apakah aplikasi sedang bekerja atau error.
 
-Sonner (Toasts): Integrasikan gRPC error codes ke dalam Toast. Jika backend mengirim error PERMISSION_DENIED, aplikasi otomatis memunculkan pesan merah "Anda tidak punya akses".
+Sonner (Toasts)✅: Integrasikan gRPC error codes ke dalam Toast. Jika backend mengirim error PERMISSION_DENIED, aplikasi otomatis memunculkan pesan merah "Anda tidak punya akses".
 
 NProgress: Indikator loading di bagian atas layar saat navigasi antar halaman atau saat request gRPC sedang berjalan.
 
@@ -60,7 +60,7 @@ Environment Manager: Skema .env.example yang jelas untuk memisahkan URL gRPC bac
 Komponen,Status,Mengapa Penting?
 gRPC Mocking,✅ Aman,Bisa ngoding tanpa nunggu backend jadi.
 Interceptors,✅ sudah,Agar tidak perlu urus token manual di setiap fitur.
-Global Error Handler,❌ Belum,Agar error gRPC tidak membuat aplikasi crash.
+Global Error Handler,✅ Belum,Agar error gRPC tidak membuat aplikasi crash.
 Zod Schema,❌ Belum,Validasi input user sebelum dikirim ke backend.
 Dark/Light Mode,❌ Belum,Kenyamanan visual standar industri.
 

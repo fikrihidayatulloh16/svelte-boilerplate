@@ -2,6 +2,7 @@
     import { enhance } from '$app/forms';
     import { Input } from '$lib/components/ui/input';
     import { Button } from '$lib/components/ui/button';
+	import { toast } from 'svelte-sonner';
 
     let isSubmitting = $state(false);
 </script>
@@ -14,12 +15,27 @@
             method="POST" 
             action="?/login" 
             use:enhance={() => {
-                isSubmitting = true;
-                return async ({ update }) => {
-                    await update();
-                    isSubmitting = false;
-                };
-            }}
+            isSubmitting = true;
+            
+            // Fungsi ini berjalan SETELAH server merespon
+            return async ({ result, update }) => {
+                isSubmitting = false;
+
+                if (result.type === 'redirect') {
+                    // SERVER MENJAWAB SUKSES (Redirect)
+                    // Panggil sonner di sini! Karena ini berjalan di browser.
+                    toast.success("Berhasil, selamat datang di Dashboard!");
+                    console.log("pengecekan toast");
+                    
+                } else if (result.type === 'failure') {
+                    // SERVER MENJAWAB GAGAL
+                    toast.error("Gagal masuk.");
+                }
+                
+                // Lanjutkan update state SvelteKit bawaan (termasuk eksekusi redirect-nya)
+                await update();
+            };
+        }}
             class="space-y-4"
         >
             <div>
