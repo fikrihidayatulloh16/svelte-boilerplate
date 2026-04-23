@@ -59,7 +59,7 @@ Environment Manager: Skema .env.example yang jelas untuk memisahkan URL gRPC bac
 
 Komponen,Status,Mengapa Penting?
 gRPC Mocking,✅ Aman,Bisa ngoding tanpa nunggu backend jadi.
-Interceptors,❌ Belum,Agar tidak perlu urus token manual di setiap fitur.
+Interceptors,✅ Belum,Agar tidak perlu urus token manual di setiap fitur.
 Global Error Handler,❌ Belum,Agar error gRPC tidak membuat aplikasi crash.
 Zod Schema,❌ Belum,Validasi input user sebelum dikirim ke backend.
 Dark/Light Mode,❌ Belum,Kenyamanan visual standar industri.

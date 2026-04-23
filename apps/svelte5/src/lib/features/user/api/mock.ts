@@ -11,7 +11,7 @@ export const userMock = (router: ConnectRouter) => {
         users: [
           { 
             id: "1", 
-            fullName: "Fikri Hidayatulloh", 
+            fullName: "Muhammad Fikri Hidayatulloh", 
             email: "fikri@example.com",
             isActive: true,
             createdAt: new Date().toISOString(),

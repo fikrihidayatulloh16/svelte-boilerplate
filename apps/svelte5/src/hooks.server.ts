@@ -15,12 +15,21 @@ const authHandler: Handle = async ({ event, resolve }) => {
         // Kita masukkan objek murni biasa. Bebas tambah properti apa saja!
         event.locals.user = {
             id: '1',
-            fullName: 'Fikri Hidayatulloh',
+            fullName: 'Admin User',
             role: 'admin',      // <-- Tidak akan error lagi!
-            email: 'fikri@example.com'
+            email: 'admin@example.com'
         };
     } else {
         event.locals.user = null;
+    }
+
+    // --- PROTEKSI RUTE (Pintu Gerbang) ---
+    const isAccessingDashboard = event.url.pathname.startsWith('/dashboard');
+    
+    // Jika mencoba masuk dashboard tapi tidak ada user di Locals
+    if (isAccessingDashboard && !event.locals.user) {
+        // Gunakan 303 untuk redirect setelah pengecekan server
+        throw redirect(303, '/auth/login');
     }
 
     return resolve(event);
