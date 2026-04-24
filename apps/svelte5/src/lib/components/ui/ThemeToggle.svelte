@@ -1,6 +1,7 @@
 <script lang="ts">
     import { themeStore } from '$lib/shared/stores/theme.svelte';
-    import { Sun, Moon } from 'lucide-svelte'; // Asumsi Anda pakai lucide icons
+    import Sun from 'lucide-svelte/icons/sun';
+    import Moon from 'lucide-svelte/icons/moon';
 </script>
 
 <button

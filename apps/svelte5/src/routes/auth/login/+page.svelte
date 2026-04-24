@@ -11,7 +11,11 @@
 
 
 <main class="flex h-screen items-center justify-center">
-     <ThemeToggle />
+
+    <div class="absolute right-6 top-6">
+        <ThemeToggle />
+    </div>
+
     <div class="rounded-xl bg-white p-8 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-800">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Login Sistem</h1>
        
