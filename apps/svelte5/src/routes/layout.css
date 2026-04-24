@@ -3,7 +3,7 @@
 @import "shadcn-svelte/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
@@ -123,7 +123,7 @@
 		@apply border-border outline-ring/50;
 	}
 	body {
-		@apply bg-background text-foreground;
+		@apply bg-background text-foreground bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
 	}
 	html {
 		@apply font-sans;

@@ -3,14 +3,18 @@
     import { Input } from '$lib/components/ui/input';
     import { Button } from '$lib/components/ui/button';
 	import { toast } from 'svelte-sonner';
+	import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
 
     let isSubmitting = $state(false);
 </script>
 
-<main class="flex h-screen items-center justify-center bg-gray-50">
-    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-md border">
-        <h1 class="text-2xl font-bold mb-6 text-center">Login Sistem</h1>
 
+
+<main class="flex h-screen items-center justify-center">
+     <ThemeToggle />
+    <div class="rounded-xl bg-white p-8 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-800">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Login Sistem</h1>
+       
         <form 
             method="POST" 
             action="?/login" 
@@ -39,7 +43,7 @@
             class="space-y-4"
         >
             <div>
-                <label for="email" class="text-sm font-medium">Email</label>
+                <label for="email" class="border border-gray-300 bg-white text-gray-900 dark:border-gray-700 dark:bg-gray-950 dark:text-white">Email</label>
                 <Input id="email" name="email" type="email" placeholder="try admin@example.com" required />
             </div>
             

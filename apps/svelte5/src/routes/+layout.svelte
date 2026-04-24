@@ -56,6 +56,14 @@
 	
 
 	onMount(() => {
+        // 1. EKSEKUSI PEMBUNUHAN INITIAL LOADER
+        // Karena ini dijalankan oleh Svelte, CSP menganggapnya 100% aman (Trusted Script)
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 100); // Hapus dari DOM setelah fade-out
+        }
+
         // Mendengarkan semua teriakan error dari REST, gRPC, atau komponen apapun
         const handleAppError = (e: Event) => {
             const customEvent = e as CustomEvent;
