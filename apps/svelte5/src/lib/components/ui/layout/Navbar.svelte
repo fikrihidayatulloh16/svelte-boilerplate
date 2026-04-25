@@ -5,6 +5,7 @@
     import Bell from 'lucide-svelte/icons/bell';
     import CircleUser from 'lucide-svelte/icons/circle-user';
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+    import { enhance } from '$app/forms';
 
     // Menerima fungsi dari parent (layout) untuk membuka sidebar di mobile
     let { toggleSidebar } = $props<{ toggleSidebar: () => void }>();
@@ -51,7 +52,14 @@
                 <DropdownMenu.Item>Billing</DropdownMenu.Item>
                 <DropdownMenu.Item>Team</DropdownMenu.Item>
                 <DropdownMenu.Item>Subscription</DropdownMenu.Item>
-                <DropdownMenu.Item>Log out</DropdownMenu.Item>
+                <DropdownMenu.Separator />
+                <form action="/auth/logout" method="POST" use:enhance>
+                    <DropdownMenu.Item class="p-0">
+                        <button type="submit" class="w-full text-left px-2 py-1.5 text-red-600 dark:text-red-400">
+                            Log out
+                        </button>
+                    </DropdownMenu.Item>
+                </form>
                 </DropdownMenu.Group>
             </DropdownMenu.Content>
         </DropdownMenu.Root>

@@ -1,3 +1,4 @@
+<!-- apps/svelte5/src/app.html -->
 <!doctype html>
 <html lang="en">
 	<head>
@@ -21,14 +22,13 @@
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         </style>
 
-		<script>
-			// Cek LocalStorage ATAU sistem OS user
-			if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-				document.documentElement.classList.add('dark');
-			} else {
-				document.documentElement.classList.remove('dark');
-			}
-		</script>
+		<script nonce="%sveltekit.nonce%">
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        </script>
 	</head>
 
 	<body 

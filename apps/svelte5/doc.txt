@@ -43,9 +43,9 @@ NProgress v1.0✅: Indikator loading di bagian atas layar saat navigasi antar ha
 3. Form Handling & Validation (The "Muscle")
 Bisnis itu 80% adalah mengisi form.
 
-Zod Integration: Karena gRPC sudah memberi tipe data, Anda tinggal menyambungkannya dengan Zod untuk validasi di sisi klien.
+Zod Integration✅: Karena gRPC sudah memberi tipe data, Anda tinggal menyambungkannya dengan Zod untuk validasi di sisi klien.
 
-Svelte-Forms-Lib / Superforms: Mengelola state input (dirty, touched, error) agar Anda tidak membuat variabel $state manual untuk setiap kolom input.
+Svelte-Forms-Lib (jadinya superform) / Superforms✅: Mengelola state input (dirty, touched, error) agar Anda tidak membuat variabel $state manual untuk setiap kolom input.
 
 4. Theme & Layout Engine
 Dark Mode: Pasang svelte-themes. Di tahun 2026, dark mode bukan fitur bonus, tapi kewajiban.

@@ -11,14 +11,17 @@ const realClient = createClient(AuthService, transport);
 const mockClient = {
     login: async (req: any) => {
         // Simulasi delay jaringan
-        await new Promise(resolve => setTimeout(resolve, 1000)); 
+        // await new Promise(resolve => setTimeout(resolve, 1000)); 
         
         if (req.email === 'admin@example.com' && req.password === 'admin123') {
             return { sessionToken: 'mock-token-xyz', user: { full_name: 'Admin' } };
         }
         throw new Error("Email atau password salah");
     },
-    logout: async () => ({ success: true, message: "Berhasil logout" })
+    logout: async () => {
+        // await new Promise(resolve => setTimeout(resolve, 500)); // Simulasi delay
+        return { success: true, message: "Berhasil logout" };
+    }
 };
 
 // 3. SWITCHER (Tinggal ubah true/false saat backend asli sudah siap)
