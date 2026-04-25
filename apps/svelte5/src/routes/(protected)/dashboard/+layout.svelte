@@ -16,7 +16,7 @@
     // INILAH DATA DOMAINNYA (Bisa diganti jika ini adalah folder (admin) atau (guru))
     const dashboardMenu: MenuItem[] = [
         { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-        { label: 'Manajemen Pengguna', href: '/dashboard/users', icon: Users },
+        { label: 'Table User', href: '/dashboard/user_table', icon: Users },
         { label: 'Data Master', href: '/dashboard/master', icon: Database },
         { label: 'Pengaturan', href: '/dashboard/settings', icon: Settings },
     ];

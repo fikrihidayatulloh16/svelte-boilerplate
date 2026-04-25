@@ -42,7 +42,11 @@
     <div class="h-[calc(100vh-4rem)] overflow-y-auto px-4 py-6 md:h-screen">
         <ul class="space-y-1">
             {#each menuItems as item}
-                {@const isActive = currentPath === item.href || currentPath.startsWith(item.href + '/')}
+                {@const isActive =
+                    item.href === '/dashboard'
+                        ? currentPath === '/dashboard'
+                        : currentPath === item.href || currentPath.startsWith(item.href + '/')
+                }
                 {@const Icon = item.icon}
                 
                 <li>
