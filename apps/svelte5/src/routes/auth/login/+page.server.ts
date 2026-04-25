@@ -1,58 +1,49 @@
-// apps/svelte5/src/routes/auth/login/+page.server.ts
+// src/routes/auth/login/+page.server.ts
 import { fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { loginSchema } from '$lib/features/auth/auth.schema'; 
-import { authClient } from "$lib/features/auth/api/auth.grpcClient";
-import type { z } from 'zod'; // Tambahkan ini
-import { dev } from '$app/environment'; // Gunakan bawaan SvelteKit untuk cek env
+import { authService } from '$lib/features/auth/api/auth.service';
+import { dev } from '$app/environment'; 
 
-// Definisikan tipe data form agar inferensi berjalan mulus
-type LoginSchema = typeof loginSchema;
-
-export const load: PageServerLoad = async ({locals}) => {
-    // Tambahkan as any pada zod adapter jika TS masih protes soal versi zod
-    return {
-        form: await superValidate(zod(loginSchema))
-    };
+// 1. Export the load function correctly
+export const load = async () => {
+    // Force the type cast to any if the adapter is complaining due to version mismatch
+    const form = await superValidate(zod(loginSchema as any));
+    return { form };
 };
 
-export const actions: Actions = {
+export const actions = {
     login: async ({ request, cookies }) => {
-        // A. Validasi dengan tipe eksplisit
-        const form = await superValidate(request, zod(loginSchema));
+        // Force the type cast here as well
+        const form = await superValidate(request, zod(loginSchema as any));
 
-        // B. Cek validitas
         if (!form.valid) {
             return fail(400, { form });
         }
 
         try {
-            // C. gRPC Backend sekarang akan mengenali email & password sebagai string
-            const response = await authClient.login({
-                email: form.data.email,
-                password: form.data.password
+            // Note: because we used 'as any' above, we might need to explicitly 
+            // type the argument here if TS complains about Record<string, unknown>
+            const response = await authService.login({
+                email: form.data.email as string,
+                password: form.data.password as string
             });
 
-            // D. Set Cookie
             cookies.set('session_token', response.sessionToken, {
                 path: '/',
                 httpOnly: true,
                 sameSite: 'lax',
-                secure: !dev, // Otomatis true di production, false di local
+                secure: !dev,
                 maxAge: 60 * 60 * 24 * 7 
             });
 
         } catch (error: any) {
-            // E. Hapus penggunaan toast di sini. Gunakan message()
-            // Nantinya di +page.svelte kamu tangkap message ini untuk ditampilkan lewat toast
-            return message(form, error.rawMessage || "Gagal melakukan login, periksa kembali kredensial Anda.", {
+            return message(form, error.rawMessage || error.message || "Gagal melakukan login", {
                 status: 401 
             });
         }
 
-        // F. Redirect
         throw redirect(303, '/dashboard');
     }
 };

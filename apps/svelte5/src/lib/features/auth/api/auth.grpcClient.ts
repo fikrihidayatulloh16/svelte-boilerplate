@@ -5,16 +5,17 @@ import { transport } from "$lib/shared/api/transport";
 import { AuthService } from "$lib/gen/proto/auth_pb"; 
 
 // 1. Client Nyata (Tersambung ke gRPC Backend)
-const realClient = createClient(AuthService, transport);
+export const realClient = createClient(AuthService, transport);
 
 // 2. Client Palsu (Mock)
-const mockClient = {
+export const mockClient = {
     login: async (req: any) => {
-        // Simulasi delay jaringan
-        // await new Promise(resolve => setTimeout(resolve, 1000)); 
-        
         if (req.email === 'admin@example.com' && req.password === 'admin123') {
-            return { sessionToken: 'mock-token-xyz', user: { full_name: 'Admin' } };
+            return { 
+                sessionToken: 'mock-token-xyz', 
+                // Ensure this matches the proto definition!
+                user: { fullName: 'Admin' } 
+            };
         }
         throw new Error("Email atau password salah");
     },

@@ -2,11 +2,11 @@
 <script lang="ts">
     import * as Table from "$lib/components/ui/table";
     import { Badge } from "$lib/components/ui/badge";
-    import type { User } from "$lib/gen/proto/user_pb";
+    import type { UserEntity } from "../schema/user.schema";
 
     // Kita terima data langsung sebagai props, bukan store
     let { users = [], isLoading = false } = $props<{ 
-        users: User[], 
+        users: UserEntity[], 
         isLoading: boolean 
     }>();
 </script>

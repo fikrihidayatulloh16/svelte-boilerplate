@@ -48,9 +48,9 @@ Zod Integration✅: Karena gRPC sudah memberi tipe data, Anda tinggal menyambung
 Svelte-Forms-Lib (jadinya superform) / Superforms✅: Mengelola state input (dirty, touched, error) agar Anda tidak membuat variabel $state manual untuk setiap kolom input.
 
 4. Theme & Layout Engine
-Dark Mode: Pasang svelte-themes. Di tahun 2026, dark mode bukan fitur bonus, tapi kewajiban.
+Dark Mode ✅: Pasang svelte-themes. Di tahun 2026, dark mode bukan fitur bonus, tapi kewajiban.
 
-Responsive Sidebar/Navbar: Buat komponen shell aplikasi yang sudah siap dengan slot untuk profil user dan menu navigasi.
+Responsive Sidebar/Navbar ✅: Buat komponen shell aplikasi yang sudah siap dengan slot untuk profil user dan menu navigasi.
 
 5. Deployment & Dev-Environment Consistency
 Docker & Docker Compose: Karena Anda suka self-hosting di Proxmox, boilerplate Anda harus punya Dockerfile yang sudah dioptimasi untuk SvelteKit (Node.js adapter) agar sekali push, langsung jalan di server.
@@ -61,8 +61,8 @@ Komponen,Status,Mengapa Penting?
 gRPC Mocking,✅ Aman,Bisa ngoding tanpa nunggu backend jadi.
 Interceptors,✅ sudah,Agar tidak perlu urus token manual di setiap fitur.
 Global Error Handler,✅ Belum,Agar error gRPC tidak membuat aplikasi crash.
-Zod Schema,❌ Belum,Validasi input user sebelum dikirim ke backend.
-Dark/Light Mode,❌ Belum,Kenyamanan visual standar industri.
+Zod Schema,✅ Belum,Validasi input user sebelum dikirim ke backend.
+Dark/Light Mode,✅ Belum,Kenyamanan visual standar industri.
 
 ==============================================================================
 
@@ -118,11 +118,18 @@ service AuthService {
 
 0b. generate proto buf
 
+in root/app/svelte5
 ```bash
 
 npx buf generate
 
 ```
+
+1. Create Zod Schema (if mutation)
+
+if the project has mutation like get list or post etc, continue create Zod Schema
+
+2. 
 
 ==============================================================================
 

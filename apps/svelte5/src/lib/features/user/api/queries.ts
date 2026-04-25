@@ -1,17 +1,10 @@
-// apps/svelte5/src/lib/features/user/api/queries.ts
+// features/user/api/queries.ts
 import { createQuery } from '@tanstack/svelte-query';
-import { userClient } from './grpcClient';
+import { userService } from './service'; // <--- Panggil Service, bukan Client
 
-export function useUsersQuery(search: () => string) { // Terima sebagai fungsi agar reaktif
-	return createQuery(() => ({ // <--- WAJIB dibungkus fungsi di Svelte 5
-		queryKey: ['users', search()], // Panggil fungsinya di sini
-		queryFn: async () => {
-			const res = await userClient.getUsers({ 
-				search: search(), 
-				page: 1, 
-				limit: 10 
-			});
-			return res;
-		}
-	}));
+export function useUsersQuery(search: () => string) {
+    return createQuery(() => ({
+        queryKey: ['users', search()],
+        queryFn: async () => await userService.fetchAll(search(), 1) 
+    }));
 }

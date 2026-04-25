@@ -1,3 +1,4 @@
+// apps/svelte5/src/lib/features/user/stores/userStore.svelte.ts
 import { userClient } from "../api/grpcClient";
 import type { User } from "$lib/gen/proto/user_pb";
 

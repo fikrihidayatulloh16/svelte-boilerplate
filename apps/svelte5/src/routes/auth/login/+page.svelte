@@ -48,6 +48,7 @@
                     name="password" 
                     bind:value={$form.password}
                     class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                    placeholder="masukkan password"
                 />
                 {#if $errors.password}
                     <p class="mt-1 text-sm text-red-500 dark:text-red-400">{$errors.password}</p>
