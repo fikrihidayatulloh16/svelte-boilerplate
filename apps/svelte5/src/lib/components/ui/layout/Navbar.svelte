@@ -1,6 +1,10 @@
+<!-- apps/svelte5/src/lib/components/ui/layout/Navbar.svelte -->
 <script lang="ts">
     import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
-    import { Menu, Bell, CircleUser } from 'lucide-svelte'; // Ikon dari lucide
+    import Menu from 'lucide-svelte/icons/menu';
+    import Bell from 'lucide-svelte/icons/bell';
+    import CircleUser from 'lucide-svelte/icons/circle-user';
+    import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
     // Menerima fungsi dari parent (layout) untuk membuka sidebar di mobile
     let { toggleSidebar } = $props<{ toggleSidebar: () => void }>();
@@ -33,8 +37,23 @@
 
         <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
 
-        <button class="flex items-center gap-2 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800">
+        <!-- <button class="flex items-center gap-2 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800">
             <CircleUser class="h-8 w-8 text-gray-600 dark:text-gray-300" />
-        </button>
+        </button> -->
+
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger><CircleUser class="h-8 w-8 text-gray-600 dark:text-gray-300" />User</DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+                <DropdownMenu.Group>
+                <DropdownMenu.Label>My Account</DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Item>Profile</DropdownMenu.Item>
+                <DropdownMenu.Item>Billing</DropdownMenu.Item>
+                <DropdownMenu.Item>Team</DropdownMenu.Item>
+                <DropdownMenu.Item>Subscription</DropdownMenu.Item>
+                <DropdownMenu.Item>Log out</DropdownMenu.Item>
+                </DropdownMenu.Group>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
     </div>
 </header>

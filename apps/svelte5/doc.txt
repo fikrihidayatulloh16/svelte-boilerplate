@@ -66,6 +66,142 @@ Dark/Light Mode,❌ Belum,Kenyamanan visual standar industri.
 
 ==============================================================================
 
+===================Developer Workflow Guide===========================
+
+0. (only gRPC) create .proto file
+
+0a. for example: auth.proto
+
+```Protobuf
+
+syntax = "proto3";
+
+package v1;
+
+// Objek data UserLogin
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+// Kontrak jawaban dari server (Response)
+message LoginResponse {
+  string session_token = 1;
+  User user = 2;
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string full_name = 3;
+  string role = 4;
+}
+
+message LogoutRequest {
+  // Kosong tidak masalah! 
+  // Di gRPC web/SvelteKit, session_token biasanya dikirim lewat 
+  // Header (Metadata), bukan lewat body request agar lebih aman.
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Definisi layanan (Service)
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+}
+
+```
+
+0b. generate proto buf
+
+```bash
+
+npx buf generate
+
+```
+
+==============================================================================
+
+===================Dark Mode Guide===========================
+
+#############################################################
+
+Prinsip 1: Mentalitas "Pasangan Warna"
+
+Ini adalah kunci utamanya. Jangan pernah mendesain sebuah elemen hanya dengan warna terang.
+
+- Pikirkan: "Jika ini putih di siang hari, apa warnanya di malam hari?"
+
+- Praktik: Setiap kali Anda mengetikkan class warna latar belakang (bg-), warna teks (text-), atau warna batas (border-), segera ketikkan juga pasangan dark:-nya.
+
+Contoh:
+
+- bg-white Pasangannya dark:bg-gray-900
+
+- text-gray-900 Pasangannya dark:text-white
+
+border-gray-200 Pasangannya dark:border-gray-700
+
+############################################################
+
+Prinsip 2: Gunakan "Aksen Utama" yang Fleksibel
+
+Aplikasi Anda pasti punya warna utama (misal: Biru/blue-600).
+
+- Di mode terang, warna terang seperti blue-600 terlihat jelas.
+
+- Di mode gelap, warna yang terlalu pekat kadang "tenggelam".
+
+Tips: Gunakan shade (tingkat kecerahan) yang sedikit berbeda untuk mode gelap.
+
+- Tombol Primer: bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600
+
+- Teks Tautan (Link): text-blue-600 dark:text-blue-400
+
+#############################################################
+
+Prinsip 3: Pewarnaan Dasar (Base Colors) di Global CSS
+
+Anda tidak perlu (dan tidak boleh) menuliskan warna latar belakang <body> berulang kali di setiap halaman. Biarkan Tailwind menanganinya di level global (file src/routes/layout.css atau app.css).
+
+Kita sudah melakukannya sebelumnya dengan menambahkan class di app.html, tetapi pendekatan yang lebih "Tailwind" adalah dengan mendefinisikannya di @layer base pada CSS Anda.
+
+Jika Anda ingin mencoba pendekatan ini (opsional, tapi disarankan untuk kebersihan HTML), buka kembali layout.css dan tambahkan ini:
+
+```CSS
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tambahkan Base Layer untuk "Kanvas Utama" */
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    }
+}
+```
+
+Jika Anda melakukan ini, Anda bisa menghapus class bg-gray-50 text-gray-900 ... dari tag <body> di app.html Anda. Ini akan menjaga HTML tetap bersih, dan kanvas utama akan selalu diatur secara otomatis oleh CSS.
+
+############################################################
+
+Prinsip 4: Komponen Reusable (Atomik)
+
+Saat Anda membuat komponen seperti tombol, kartu, atau input, definisikan gaya dark mode-nya langsung di dalam komponen tersebut.
+
+Misalnya, komponen <Card>:
+
+```Svelte
+<div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    {@render children()}
+</div>
+```
+
+==============================================================================
+
 ===================perlu disesuaikan===========================
 
 ###################################
@@ -181,6 +317,19 @@ controller.abort();
 const response = await fetch('/api/data', { signal: controller.signal });
 
 ##########################
+
+#############################
+
+// apps/svelte5/src/lib/features/auth/api/auth.grpcClient.ts
+
+// 3. SWITCHER (Tinggal ubah true/false saat backend asli sudah siap)
+const USE_MOCK = true;
+
+// Ini yang di-export dan dipakai oleh +page.server.ts
+// Nanti kalau backend siap, tinggal ganti USE_MOCK = false.
+export const authClient = USE_MOCK ? mockClient : realClient;
+
+############################
 
 ==============================================================================
 

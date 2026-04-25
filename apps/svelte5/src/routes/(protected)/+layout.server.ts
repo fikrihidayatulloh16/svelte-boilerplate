@@ -1,3 +1,4 @@
+// apps/svelte5/src/routes/(protected)/+layout.server.ts
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 

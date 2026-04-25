@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package v1;
+
+// Objek data UserLogin
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+// Kontrak jawaban dari server (Response)
+message LoginResponse {
+  string session_token = 1;
+  UserLoginResponse user = 2;
+}
+
+message UserLoginResponse {
+  string id = 1;
+  string email = 2;
+  string full_name = 3;
+  string role = 4;
+}
+
+message LogoutRequest {
+  // Kosong tidak masalah! 
+  // Di gRPC web/SvelteKit, session_token biasanya dikirim lewat 
+  // Header (Metadata), bukan lewat body request agar lebih aman.
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Definisi layanan (Service)
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+}
+
