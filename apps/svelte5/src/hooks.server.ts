@@ -2,24 +2,21 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import type { HandleServerError } from '@sveltejs/kit';
+import { authService } from '$lib/features/auth/api/auth.service';
 
 const authHandler: Handle = async ({ event, resolve }) => {
     const token = event.cookies.get('session_token');
 
     if (token) {
-        // --- BAYANGKAN LOGIKA INI NANTINYA ---
-        // const grpcResponse = await userClient.getProfile({ token });
-        // ATAU
-        // const restResponse = await fetch('/api/profile').then(r => r.json());
-
-        // --- UNTUK SEKARANG (MOCKING) ---
-        // Kita masukkan objek murni biasa. Bebas tambah properti apa saja!
-        event.locals.user = {
-            id: '1',
-            fullName: 'Admin User',
-            role: 'admin',      // <-- Tidak akan error lagi!
-            email: 'admin@example.com'
-        };
+        try {
+            // PURE DECOUPLED: Hook tidak peduli ini gRPC atau REST
+            const userProfile = await authService.getProfile(token);
+            event.locals.user = userProfile;
+        } catch (err) {
+            // Jika token tidak valid / kedaluwarsa di backend
+            event.cookies.delete('session_token', { path: '/' });
+            event.locals.user = null;
+        }
     } else {
         event.locals.user = null;
     }

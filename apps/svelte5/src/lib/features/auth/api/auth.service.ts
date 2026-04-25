@@ -35,5 +35,18 @@ export const authService = {
             console.error("🚨 GAGAL LOGOUT:", error);
             throw error;
         }
+    },
+
+    async getProfile(token: string) {
+        // Service yang akan menentukan apakah memanggil gRPC, REST, atau Mock
+        const res = await authClient.getProfile({ token });
+        console.log("Berhasil masuk ke service getprofile dengan data : ", res);
+        
+        return {
+            id: res.id,
+            fullName: res.fullName,
+            role: res.role,
+            email: res.email
+        };
     }
 };

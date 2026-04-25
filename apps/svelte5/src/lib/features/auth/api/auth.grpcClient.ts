@@ -20,8 +20,13 @@ export const mockClient = {
         throw new Error("Email atau password salah");
     },
     logout: async () => {
-        // await new Promise(resolve => setTimeout(resolve, 500)); // Simulasi delay
         return { success: true, message: "Berhasil logout" };
+    },
+    getProfile: async (token: any) => {
+        if (token != null) {
+            return { fullName: 'Admin Service', role: "admin", email: "admin@example.com" };
+        }
+        
     }
 };
 
