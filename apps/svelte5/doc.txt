@@ -112,7 +112,13 @@ this is where the UI component developed
 
 6. Show to the page
 
-after component create present it in routes
+after component create present it in routes to see in localhost type this command
+
+```bash
+npm run dev
+//or
+rm -rf node_modules/.vite && npm run dev
+```
 
 ==============================================================================
 
@@ -210,100 +216,13 @@ Misalnya, komponen <Card>:
 
 ===================perlu disesuaikan===========================
 
-jika boilerplate ini terbukti kokoh, ketika ingin dipakai dengan api atau backend yang asli, yang diubah hanya service, transport tapi cek berikut
-
-###################################
-// apps/svelte5/src/hooks.server.ts
-
-if (token) {
-        // --- BAYANGKAN LOGIKA INI NANTINYA ---
-        // const grpcResponse = await userClient.getProfile({ token });
-        // ATAU
-        // const restResponse = await fetch('/api/profile').then(r => r.json());
-
-        // --- UNTUK SEKARANG (MOCKING) ---
-        // Kita masukkan objek murni biasa. Bebas tambah properti apa saja!
-        event.locals.user = {
-            id: '1',
-            fullName: 'Fikri Hidayatulloh',
-            role: 'admin',      // <-- Tidak akan error lagi!
-            email: 'fikri@example.com'
-        };
-    } else {
-        event.locals.user = null;
-    }
-
-######################################
-// apps/svelte5/src/hooks.server.ts
-
-const authHandler: Handle = async ({ event, resolve }) => {
-    const token = event.cookies.get('session_token');
-
-    if (token) {
-        // --- BAYANGKAN LOGIKA INI NANTINYA ---
-        // const grpcResponse = await userClient.getProfile({ token });
-        // ATAU
-        // const restResponse = await fetch('/api/profile').then(r => r.json());
-
-        // --- UNTUK SEKARANG (MOCKING) ---
-        // Kita masukkan objek murni biasa. Bebas tambah properti apa saja!
-        event.locals.user = {
-            id: '1',
-            fullName: 'Fikri Hidayatulloh',
-            role: 'admin',      // <-- Tidak akan error lagi!
-            email: 'fikri@example.com'
-        };
-    } else {
-        event.locals.user = null;
-    }
-
-    return resolve(event);
-};
-
-####################################
+jika boilerplate ini terbukti kokoh, ketika ingin dipakai dengan api atau backend yang asli, yang diubah hanya proto(kalau gRPC) service, transport, client dan .env tapi tetap cek berikut
 
 ################################
 // apps/svelte5/src/lib/shared/api/transport.ts
 
 // Ganti ke 'false' nanti jika Backend Nginx/Go/NestJS Anda sudah siap
 const USE_MOCK = true; 
-
-#################################
-
-################################
-// apps/svelte5/src/routes/auth/login/+page.server.ts
-export const actions = {
-    login: async ({ request, cookies }) => {
-        const data = await request.formData();
-        const email = data.get('email');
-        const password = data.get('password');
-
-        // --- MOCK LOGIC: Pura-pura validasi ke Backend ---
-        // Jika di dunia nyata, di sini Anda melakukan:
-        // const res = await fetch('http://api.fikri.com/login', { ... })
-
-        //  SESUAIKAN APAKAH TOKEN ATAU COOKIE
-
-        // const token = res.json().token;
-
-        if (email === 'admin@example.com' && password === 'admin123') {
-            // Berhasil login! Kita tanam Cookie session_token
-            cookies.set('session_token', 'mock-jwt-token-xyz-789', {
-                path: '/',
-                httpOnly: true, // Tidak bisa dibaca XSS hacker
-                sameSite: 'strict',
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 60 * 60 * 24 // 1 Hari
-            });
-
-            // Redirect ke halaman terproteksi
-            throw redirect(303, '/dashboard');
-        }
-
-        // Jika gagal login
-        return fail(401, { error: 'Email atau password salah!' });
-    }
-} satisfies Actions;
 
 #################################
 
@@ -349,7 +268,7 @@ export const authClient = USE_MOCK ? mockClient : realClient;
 
 ==============================================================================
 
-========================= The Absolute Rule keep clean aadn decoupled ============
+========================= The Absolute Rule keep clean and decoupled ============
 
 Cek Ombak: Aturan Main untuk "File Lainnya"
 Agar arsitektur ini tetap decoupled, setiap file sekarang memiliki aturan ketat tentang apa yang boleh dan tidak boleh diimpor.
