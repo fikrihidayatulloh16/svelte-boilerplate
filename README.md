@@ -138,7 +138,7 @@ service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc Logout(LogoutRequest) returns (LogoutResponse);
 }
-```dwd
+```
 
 ### user contract
 
