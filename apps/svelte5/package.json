@@ -14,7 +14,8 @@
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run && npm run test:e2e",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"generate": "buf generate ../../proto"
 	},
 	"devDependencies": {
 		"@bufbuild/buf": "^1.68.2",
