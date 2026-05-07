@@ -10,9 +10,11 @@ export const realClient = createClient(AuthService, transport);
 // 2. Client Palsu (Mock)
 export const mockClient = {
     login: async (req: any) => {
-        if (req.email === 'admin@example.com' && req.password === 'admin123') {
+        console.log(req);
+        
+        if (req.email === 'admin@example.com' && req.passwordRaw === 'admin123') {
             return { 
-                sessionToken: 'mock-token-xyz', 
+                sessionToken: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzRiZWRhMi03NjQxLTQ0ZjgtYWM2NC1hODdjN2UyNDk3NDAiLCJlbWFpbCI6ImFkbWluMEBleGFtcGxlLmNvbSIsInJvbGUiOiJVc2VyIiwiZXhwIjoxNzc4MjA5MTAzfQ.g3Q_E9UfOOCAfbvYrQfQAehdweN1u3_P-gQBoyZlozQ', 
                 // Ensure this matches the proto definition!
                 user: { fullName: 'Admin' } 
             };
@@ -31,7 +33,7 @@ export const mockClient = {
 };
 
 // 3. SWITCHER (Tinggal ubah true/false saat backend asli sudah siap)
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 // Ini yang di-export dan dipakai oleh +page.server.ts
 // Nanti kalau backend siap, tinggal ganti USE_MOCK = false.

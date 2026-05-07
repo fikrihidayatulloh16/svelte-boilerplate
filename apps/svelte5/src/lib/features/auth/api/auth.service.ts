@@ -11,19 +11,41 @@ export const authService = {
         try {
             const res = await authClient.login({ 
                 email: credentials.email, 
+                // Zod menggunakan password_raw, Proto TS menggunakan passwordRaw
                 password: credentials.password 
             });
 
+            console.log(res);
+
+            console.log("✅ Rust membalas dengan token:", res.token);
+
+            // 2. Perbaikan Logika: Tangani respon 'error' dari backend
+            if (res.status === "error") {
+                // Lempar ke block catch agar ditangkap oleh UI/Superforms
+                throw new Error(res.message || "Login gagal dari server");
+            }
+
+            // 3. Perbaikan Output: Sesuaikan kembalian murni dengan apa yang ada di Proto
             return {
+                // Proto mengembalikan 'token', bukan 'sessionToken'
                 sessionToken: res.sessionToken,
                 user: {
-                    // Now TypeScript is happy because both mock and real 
-                    // return the same property name (e.g., fullName)
-                    name: res.user?.fullName || 'User Tanpa Nama'
+                    id: res.user?.id,
+                    email: res.user?.email,
+                    fullName: res.user?.fullName,
+                    role: res.user?.role
                 }
+                
+                // CATATAN KRITIS: 
+                // Karena backend tidak mengembalikan data profil di LoginResponse, 
+                // Anda tidak bisa me-return objek user di sini. Anda harus mengambilnya
+                // terpisah (misal memanggil getProfile) atau men-decode JWT di server.
             };
+
         } catch (error) {
             console.error("🚨 GAGAL DI AUTH SERVICE:", error);
+            
+            
             throw error; 
         }
     },

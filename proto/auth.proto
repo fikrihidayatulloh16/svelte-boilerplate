@@ -1,40 +1,65 @@
 syntax = "proto3";
 
-package v1;
+// Gunakan versioning yang baik
+package auth.v1; 
 
-// Objek data UserLogin
-message LoginRequest {
-    string email = 1;
-    string password = 2;
+service AuthService {
+  // Registrasi pengguna baru
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+
+  // Login pengguna
+  rpc Login (LoginRequest) returns (LoginResponse);
+
+  // Logout pengguna (Hapus token di sisi server/redis jika perlu)
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
 }
 
-// Kontrak jawaban dari server (Response)
+// ==========================================
+// REGISTER
+// ==========================================
+message RegisterRequest {
+  string email = 1;
+  string full_name = 2;
+  string password = 3; // Gunakan "password", biarkan server yang tahu itu raw
+}
+
+message RegisterResponse {
+  // Cukup kembalikan data user yang baru dibuat, 
+  // gRPC akan otomatis handle status 200 OK
+  UserResponse user = 1; 
+}
+
+// ==========================================
+// LOGIN
+// ==========================================
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
 message LoginResponse {
   string session_token = 1;
-  UserLoginResponse user = 2;
+  UserResponse user = 2;
 }
 
-message UserLoginResponse {
+// ==========================================
+// LOGOUT
+// ==========================================
+message LogoutRequest {
+  // Kosong. Token diambil dari Metadata/Header HTTP oleh Interceptor Rust
+}
+
+message LogoutResponse {
+  bool success = 1;
+}
+
+// ==========================================
+// ENTITAS BERSAMA (SHARED)
+// ==========================================
+// Struct ini bisa dipakai ulang di Register, Login, atau GetMe
+message UserResponse {
   string id = 1;
   string email = 2;
   string full_name = 3;
   string role = 4;
 }
-
-message LogoutRequest {
-  // Kosong tidak masalah! 
-  // Di gRPC web/SvelteKit, session_token biasanya dikirim lewat 
-  // Header (Metadata), bukan lewat body request agar lebih aman.
-}
-
-message LogoutResponse {
-  bool success = 1;
-  string message = 2;
-}
-
-// Definisi layanan (Service)
-service AuthService {
-  rpc Login(LoginRequest) returns (LoginResponse);
-  rpc Logout(LogoutRequest) returns (LogoutResponse);
-}
-
