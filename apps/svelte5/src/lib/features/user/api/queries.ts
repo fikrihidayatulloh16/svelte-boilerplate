@@ -1,10 +1,24 @@
-// features/user/api/queries.ts
-import { createQuery } from '@tanstack/svelte-query';
-import { userService } from './service'; // <--- Panggil Service, bukan Client
+// queries.ts
+import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
+import { userService } from './service'; // sesuaikan path
 
-export function useUsersQuery(search: () => string) {
-    return createQuery(() => ({
-        queryKey: ['users', search()],
-        queryFn: async () => await userService.fetchAll(search(), 1) 
-    }));
+// 1. KONTRAK: Beritahu TypeScript bahwa kita meminta FUNGSI, bukan angka mati
+export function useUsersQuery(
+    search: () => string,
+    page: () => number,     // <-- Harus () => number, bukan sekadar number
+    limit: () => number     // <-- Harus () => number
+) {
+    return createQuery(() => {
+        // Karena mereka fungsi, kita wajb mengeksekusinya untuk mendapatkan nilainya
+        const currentSearch = search();
+        const currentPage = page();
+        const currentLimit = limit();
+
+        return {
+            queryKey: ['users', currentSearch, currentPage, currentLimit],
+            queryFn: async () => await userService.fetchAll(currentSearch, currentPage, currentLimit),
+            placeholderData: keepPreviousData,
+            staleTime: 60 * 1000,
+        };
+    });
 }

@@ -3,16 +3,22 @@
 import { createClient } from "@connectrpc/connect";
 import { transport } from "$lib/shared/api/transport";
 import { AuthService } from "$lib/gen/proto/auth_pb"; 
+import { PUBLIC_API_URL, PUBLIC_USE_MOCK } from '$env/static/public';
 
 // 1. Client Nyata (Tersambung ke gRPC Backend)
 export const realClient = createClient(AuthService, transport);
+
+// 3. SWITCHER (Tinggal ubah true/false saat backend asli sudah siap)
+const USE_MOCK = false;
+
+
 
 // 2. Client Palsu (Mock)
 export const mockClient = {
     login: async (req: any) => {
         console.log(req);
         
-        if (req.email === 'admin@example.com' && req.passwordRaw === 'admin123') {
+        if (req.email === 'admin@example.com' && req.password === 'admin123') {
             return { 
                 sessionToken: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzRiZWRhMi03NjQxLTQ0ZjgtYWM2NC1hODdjN2UyNDk3NDAiLCJlbWFpbCI6ImFkbWluMEBleGFtcGxlLmNvbSIsInJvbGUiOiJVc2VyIiwiZXhwIjoxNzc4MjA5MTAzfQ.g3Q_E9UfOOCAfbvYrQfQAehdweN1u3_P-gQBoyZlozQ', 
                 // Ensure this matches the proto definition!
@@ -31,9 +37,6 @@ export const mockClient = {
         
     }
 };
-
-// 3. SWITCHER (Tinggal ubah true/false saat backend asli sudah siap)
-const USE_MOCK = false;
 
 // Ini yang di-export dan dipakai oleh +page.server.ts
 // Nanti kalau backend siap, tinggal ganti USE_MOCK = false.

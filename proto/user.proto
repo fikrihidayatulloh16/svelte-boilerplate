@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package v1;
+package user;
 
 // Objek data User
 message User {

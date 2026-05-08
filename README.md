@@ -7,6 +7,109 @@
 ## Structure
 
 ---
+## Production Guide
+
+### Nonce
+
+add nonce to increase the security
+
+- in hook.server
+
+```svelte
+const authHandler: Handle = async ({ event, resolve }) => {
+    const token = event.cookies.get('session_token');
+    const nonce = randomBytes(16).toString('base64');
+    event.locals.nonce = nonce;
+
+    if (token) {
+        try {
+            // Trik Ninja: Decode JWT Payload tanpa library tambahan (hanya base64 decode)
+            const payloadBase64 = token.split('.')[1];
+            // Tambahkan padding '=' jika kurang, untuk mencegah error atob
+            const paddedBase64 = payloadBase64.padEnd(payloadBase64.length + (4 - payloadBase64.length % 4) % 4, '=');
+            
+            const payload = JSON.parse(Buffer.from(paddedBase64, 'base64').toString('utf-8'));
+
+            // Cek apakah token sudah expired
+            if (Date.now() >= payload.exp * 1000) {
+                throw new Error("Token expired");
+            }
+
+            // Masukkan ke locals agar bisa dipakai di semua halaman Svelte!
+            event.locals.user = {
+                id: payload.sub,
+                email: payload.email,
+                role: payload.role,
+                // fullName tidak ada di JWT log Anda, bisa dikosongkan atau ditambahkan di Rust nanti
+                fullName: 'User' 
+            };
+        } catch (err) {
+            console.error("🚨 Token Invalid / Expired, menghapus sesi...");
+            event.cookies.delete('session_token', { path: '/' });
+            event.locals.user = null;
+        }
+    } else {
+        event.locals.user = null;
+    }
+
+    const response = await resolve(event, {
+        transformPageChunk: ({ html }) => 
+            html.replace('%sveltekit.nonce%', nonce)
+    });
+
+    // Security headers
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Permissions-Policy', 
+        'camera=(), microphone=(), geolocation=()'
+    );
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+
+    const isProd = process.env.NODE_ENV === 'production';
+    
+    response.headers.set('Content-Security-Policy', [
+        "default-src 'self'",
+        `script-src 'self' 'nonce-${nonce}'`,   // ← nonce, bukan unsafe-inline
+        "style-src 'self' 'unsafe-inline'",      // Tailwind masih butuh ini
+        "img-src 'self' data: https:",
+        // Development: izinkan localhost gRPC dan HMR
+        // Production: ganti dengan domain asli
+        isProd
+            ? "connect-src 'self' https://api.yourdomain.com"
+            : "connect-src 'self' http://localhost:50051 http://localhost:3000 ws:",
+        "font-src 'self'",
+        "frame-ancestors 'none'",               // Lebih kuat dari X-Frame-Options
+        "base-uri 'self'",                       // Cegah base tag injection
+        "form-action 'self'",                    // Cegah form hijacking
+    ].join('; '));
+
+    // HSTS — hanya production, jangan di development
+    if (isProd) {
+        response.headers.set(
+            'Strict-Transport-Security',
+            'max-age=31536000; includeSubDomains; preload'
+        );
+    }
+
+    return response;
+};
+```
+
+- in app.d.ts
+
+```ts
+interface Locals {
+            // Tipe murni, tidak ada urusan dengan gRPC
+            user: {
+                id: string;
+                fullName: string;
+                role: string;
+                email?: string;
+            } | null;
+            // nonce: string;
+        }
+```
 
 ## 🚀 Developer Workflow Guide (SvelteKit + gRPC Clean Architecture)
 

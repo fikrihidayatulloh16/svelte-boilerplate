@@ -11,6 +11,7 @@ declare global {
                 role: string;
                 email?: string;
             } | null;
+            // nonce: string;
         }
 		// interface Error {}
 		// interface Locals {}

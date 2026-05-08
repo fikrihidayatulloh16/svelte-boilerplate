@@ -6,7 +6,7 @@ import { userMock } from "$lib/features/user/api/mock";
 import { errorInterceptor, loadingInterceptor, retryInterceptor } from "./interceptors";
 
 // Ganti ke 'false' nanti jika Backend Nginx/Go/NestJS Anda sudah siap
-const USE_MOCK = false; 
+const USE_MOCK = true; 
 
 // --- 1. MOCK TRANSPORT (Simulasi tanpa jaringan) ---
 const mockTransport = createRouterTransport((router) => {

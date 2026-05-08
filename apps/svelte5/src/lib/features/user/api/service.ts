@@ -3,15 +3,12 @@ import { userClient } from "./grpcClient";
 import { userSchema, type UserEntity } from "../schema/user.schema";
 
 export const userService = {
-    async fetchAll(search: string, page: number) {
+    // Tambahkan parameter limit di sini
+    async fetchAll(search: string, page: number, limit: number) {
         try {
-            // console.log("1. Service dipanggil!");
-            // Panggil client secara normal (dia akan lari ke Mock secara otomatis jika USE_MOCK=true)
-            const res = await userClient.getUsers({ search, page, limit: 10 });
+            const res = await userClient.getUsers({ search, page, limit });
 
-            // console.log("2. Data mentah dari Mock/Backend:", res);
-            
-            // Mapping cerdas dengan Zod
+            // Mapping cerdas dengan Zod tetap berjalan
             const items: UserEntity[] = res.users.map((u) => {
                 return userSchema.parse({
                     id: u.id,
@@ -19,18 +16,19 @@ export const userService = {
                     fullName: u.fullName,
                     avatar_url: u.avatarUrl,
                     isActive: u.isActive,
-                    // Kita hanya perlu mengintervensi bagian yang butuh transformasi
                     createdAt: new Date(u.createdAt),
                     updated_at: new Date(u.updatedAt)
                 });
             });
 
-            // console.log("3. Data berhasil di-map:", items);
+            console.log(res);
+            
 
-            return { items, total: res.totalCount };
+            // Pastikan Anda membalikkan items (bukan res.users mentah)
+            return { items, total: Number(res.totalCount) };
         } catch (error) {
             console.error("🚨 GAGAL DI SERVICE LAYER:", error);
-            throw error; // Lempar lagi agar TanStack tahu ini error
+            throw error; 
         }
     }
 };

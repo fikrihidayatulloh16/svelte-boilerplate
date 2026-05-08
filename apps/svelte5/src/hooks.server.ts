@@ -52,7 +52,7 @@ const authHandler: Handle = async ({ event, resolve }) => {
         "script-src 'self' 'unsafe-inline'; " +            // Mengizinkan script bawaan Svelte
         "style-src 'self' 'unsafe-inline'; " +             // KUNCI: Mengembalikan gaya Tailwind/CSS Anda!
         "img-src 'self' data: https:; " +                  // Mengizinkan gambar dari data URI (SVG/Favicon)
-        "connect-src 'self' http://localhost:3000 ws:;"    // Mengizinkan gRPC (localhost:3000) & Vite HMR (ws:)
+        "connect-src 'self' http://localhost:50051 ws:; "  // Mengizinkan gRPC (localhost:3000) & Vite HMR (ws:)
     );
 
     

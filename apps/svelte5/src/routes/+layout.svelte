@@ -79,7 +79,7 @@
 <Toaster richColors position="bottom-right" />
 
 <!-- <LoadingBar /> -->
- <LoadingCircle />
+ <LoadingBar />
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <QueryClientProvider client={queryClient}>
