@@ -15,10 +15,6 @@ export const authService = {
                 password: credentials.password 
             });
 
-            console.log(res);
-
-            console.log("✅ Rust membalas dengan token:", res.token);
-
             // 2. Perbaikan Logika: Tangani respon 'error' dari backend
             if (res.status === "error") {
                 // Lempar ke block catch agar ditangkap oleh UI/Superforms
@@ -35,17 +31,10 @@ export const authService = {
                     fullName: res.user?.fullName,
                     role: res.user?.role
                 }
-                
-                // CATATAN KRITIS: 
-                // Karena backend tidak mengembalikan data profil di LoginResponse, 
-                // Anda tidak bisa me-return objek user di sini. Anda harus mengambilnya
-                // terpisah (misal memanggil getProfile) atau men-decode JWT di server.
             };
 
         } catch (error) {
             console.error("🚨 GAGAL DI AUTH SERVICE:", error);
-            
-            
             throw error; 
         }
     },
@@ -59,16 +48,16 @@ export const authService = {
         }
     },
 
-    async getProfile(token: string) {
-        // Service yang akan menentukan apakah memanggil gRPC, REST, atau Mock
-        const res = await authClient.getProfile({ token });
-        console.log("Berhasil masuk ke service getprofile dengan data : ", res);
+    // async getProfile(token: string) {
+    //     // Service yang akan menentukan apakah memanggil gRPC, REST, atau Mock
+    //     const res = await authClient.getProfile({ token });
+    //     console.log("Berhasil masuk ke service getprofile dengan data : ", res);
         
-        return {
-            id: res.id,
-            fullName: res.fullName,
-            role: res.role,
-            email: res.email
-        };
-    }
+    //     return {
+    //         id: res.id,
+    //         fullName: res.fullName,
+    //         role: res.role,
+    //         email: res.email
+    //     };
+    // }
 };

@@ -1,3 +1,4 @@
+// apps/svelte5/src/lib/features/user/schema/user.schema.ts
 import { z } from 'zod';
 
 // Ini adalah standar "User" di aplikasi kita.

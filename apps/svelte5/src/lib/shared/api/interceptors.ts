@@ -101,3 +101,18 @@ export const retryInterceptor = (options: RetryOptions = { maxAttempts: 3, initi
         }
     };
 };
+
+export const authInterceptor: Interceptor = (next) => async (req) => {
+    if (browser) {
+        // Ambil token dari cookie yang bisa dibaca JS
+        const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('session_token='))
+            ?.split('=')[1];
+
+        if (token) {
+            req.header.set('authorization', `Bearer ${token}`);
+        }
+    }
+    return next(req);
+};

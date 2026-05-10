@@ -29,15 +29,22 @@ npm run dev
 npm run dev -- --open
 ```
 
-## Building
+## Building/Production Guide
 
-To create a production version of your app:
+- To create a production version of your app:
 
 ```sh
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+- You can preview the production build with `npm run preview`.
+
+- change the secure
+
+change secure = true
+
+// src/routes/auth/login/+page.server.ts
+secure: false,
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
 

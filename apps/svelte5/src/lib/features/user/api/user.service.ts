@@ -1,12 +1,12 @@
-// apps/svelte5/src/lib/features/user/api/service.ts
-import { userClient } from "./grpcClient";
+// apps/svelte5/src/lib/features/user/api/user.service.ts
+import { userGrpcClient } from "./user.grpcClient";
 import { userSchema, type UserEntity } from "../schema/user.schema";
 
 export const userService = {
     // Tambahkan parameter limit di sini
     async fetchAll(search: string, page: number, limit: number) {
         try {
-            const res = await userClient.getUsers({ search, page, limit });
+            const res = await userGrpcClient.getUsers({ search, page, limit });
 
             // Mapping cerdas dengan Zod tetap berjalan
             const items: UserEntity[] = res.users.map((u) => {

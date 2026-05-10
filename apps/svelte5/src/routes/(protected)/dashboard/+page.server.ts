@@ -1,11 +1,16 @@
-// import type { PageServerLoad } from './$types';
+// apps/svelte5/src/routes/(protected)/dashboard/+page.server.ts
+import { userGrpcClient } from '$lib/features/user/api/user.grpcClient.js';
+import { redirect } from '@sveltejs/kit';
 
-// export const load: PageServerLoad = async () => {
-//     // --- SIMULASI API LAMBAT (2 Detik) ---
-//     // Baris ini memaksa navigasi tertahan selama 2 detik
-//     await new Promise(resolve => setTimeout(resolve, 3000));
+// +page.server.ts
+import { createServerGrpcClient } from '$lib/shared/server/grpc-client.js';
 
-//     return {
-//         // kembalikan data apa saja
-//     };
-// };
+export const load = async ({ locals, cookies }) => {
+    if (!locals.user) redirect(302, '/auth/login');
+
+    const token = cookies.get('session_token') ?? '';
+    const client = createServerGrpcClient(token); // ← gRPC native, cepat
+
+    const result = await client.getUsers({ page: 1, limit: 20, search: '' });
+    return { users: result.users };
+};

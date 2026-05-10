@@ -6,9 +6,32 @@
     import CircleUser from 'lucide-svelte/icons/circle-user';
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { enhance } from '$app/forms';
+    import { useQueryClient } from '@tanstack/svelte-query';
+    import { goto } from '$app/navigation';
 
     // Menerima fungsi dari parent (layout) untuk membuka sidebar di mobile
     let { toggleSidebar } = $props<{ toggleSidebar: () => void }>();
+    const queryClient = useQueryClient();
+    let isLoggingOut = $state(false);
+
+    async function handleLogout() {
+        isLoggingOut = true;
+        try {
+            // 1. Tembak rute internal SvelteKit yang baru saja kita buat
+            await fetch('/api/auth/logout', { method: 'POST' });
+
+            // 2. KUNCI KEAMANAN: Hapus semua cache data (tabel user, profil, dll)
+            // agar tidak bocor/tersimpan di memori browser
+            queryClient.clear();
+
+            // 3. Tendang pengguna kembali ke halaman login
+            goto('/auth/login');
+        } catch (error) {
+            console.error("Logout gagal:", error);
+        } finally {
+            isLoggingOut = false;
+        }
+    }
 </script>
 
 <header class="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white/80 px-4 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/80 sm:px-6">

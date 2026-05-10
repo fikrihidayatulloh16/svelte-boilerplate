@@ -32,9 +32,9 @@ export const actions = {
 
             cookies.set('session_token', response.sessionToken, {
                 path: '/',
-                httpOnly: true,
+                httpOnly: false,
                 sameSite: 'lax',
-                secure: !dev,
+                secure: false,
                 maxAge: 60 * 60 * 24 * 7 
             });
 

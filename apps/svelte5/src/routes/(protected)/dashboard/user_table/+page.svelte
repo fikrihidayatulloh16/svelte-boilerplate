@@ -1,6 +1,6 @@
-<!-- apps/svelte5/src/routes/+page.svelte -->
+<!-- apps/svelte5/src/routes/(protected)/dashboard/user_table/+page.svelte -->
 <script lang="ts">
-    import { useUsersQuery } from "$lib/features/user/api/queries";
+    import { useUsersQuery } from "$lib/features/user/api/user.queries";
     import UserTable from "$lib/features/user/components/userTable.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
 

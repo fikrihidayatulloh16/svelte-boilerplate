@@ -1,7 +1,7 @@
 // apps/svelte5/src/lib/features/user/stores/userStore.svelte.ts
-import { userClient } from "../api/grpcClient";
+import { userClient } from "../api/user.grpcClient";
 import type { User } from "$lib/gen/proto/user_pb";
-import { userService } from "../api/service";
+import { userService } from "../api/user.service";
 import type { UserEntity } from "../schema/user.schema";
 
 export function createUserStore() {

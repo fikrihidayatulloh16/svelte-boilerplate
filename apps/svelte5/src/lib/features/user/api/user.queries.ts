@@ -1,6 +1,6 @@
-// queries.ts
+// apps/svelte5/src/lib/features/user/api/user.queries.ts
 import { createQuery, keepPreviousData } from '@tanstack/svelte-query';
-import { userService } from './service'; // sesuaikan path
+import { userService } from './user.service'; // sesuaikan path
 
 // 1. KONTRAK: Beritahu TypeScript bahwa kita meminta FUNGSI, bukan angka mati
 export function useUsersQuery(

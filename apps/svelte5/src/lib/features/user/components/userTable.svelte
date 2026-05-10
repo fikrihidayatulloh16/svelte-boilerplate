@@ -1,6 +1,6 @@
 <!-- apps/svelte5/src/lib/features/user/components/userTable.svelte -->
 <script lang="ts">
-    import { useUsersQuery } from "../api/queries";
+    import { useUsersQuery } from "../api/user.queries";
     
     // Asumsi import komponen UI (Shadcn-Svelte) Anda
     import * as Table from "$lib/components/ui/table";

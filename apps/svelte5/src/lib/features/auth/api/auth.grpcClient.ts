@@ -1,17 +1,15 @@
 // apps/svelte5/src/lib/features/auth/api/auth.grpcClient.ts
 
 import { createClient } from "@connectrpc/connect";
-import { transport } from "$lib/shared/api/transport";
+import { createGrpcTransport  } from "$lib/shared/api/transport";
 import { AuthService } from "$lib/gen/proto/auth_pb"; 
 import { PUBLIC_API_URL, PUBLIC_USE_MOCK } from '$env/static/public';
 
 // 1. Client Nyata (Tersambung ke gRPC Backend)
-export const realClient = createClient(AuthService, transport);
+export const realClient = createClient(AuthService, createGrpcTransport() );
 
 // 3. SWITCHER (Tinggal ubah true/false saat backend asli sudah siap)
 const USE_MOCK = false;
-
-
 
 // 2. Client Palsu (Mock)
 export const mockClient = {
