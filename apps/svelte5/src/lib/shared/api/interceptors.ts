@@ -116,3 +116,27 @@ export const authInterceptor: Interceptor = (next) => async (req) => {
     }
     return next(req);
 };
+
+export const rumLatencyInterceptor: Interceptor = (next) => async (req) => {
+    // 1. Catat waktu sebelum request berangkat dari Browser
+    const start = performance.now();
+    
+    try {
+        // 2. Biarkan request berjalan ke Rust
+        const response = await next(req);
+        
+        // 3. Catat waktu saat response selesai diproses Browser
+        const duration = Math.round(performance.now() - start);
+        
+        // Cukup log di console browser saat tahap development
+        console.log(`[RUM] ${req.method.name}: ${duration}ms (E2E)`);
+        
+        // TODO (Tahap Lanjut): Kirim 'duration' ini ke server metrik
+        
+        return response;
+    } catch (error) {
+        const duration = Math.round(performance.now() - start);
+        console.error(`[RUM] ${req.method.name} GAGAL: ${duration}ms (E2E)`);
+        throw error;
+    }
+};

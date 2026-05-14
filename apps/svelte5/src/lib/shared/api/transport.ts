@@ -4,6 +4,7 @@ import { PUBLIC_API_URL, PUBLIC_USE_MOCK } from '$env/static/public';
 import { userMock } from "$lib/features/user/api/user.mock";
 import {
     authInterceptor,
+    rumLatencyInterceptor,
     errorInterceptor,
     loadingInterceptor,
     retryInterceptor
@@ -29,6 +30,7 @@ export const createGrpcTransport = (customInterceptors: Interceptor[] = []) => {
         interceptors: [
             ...customInterceptors,
             authInterceptor,
+            rumLatencyInterceptor,
             retryInterceptor({ maxAttempts: 3, initialDelayMs: 1000 }),
             loadingInterceptor,
             errorInterceptor,

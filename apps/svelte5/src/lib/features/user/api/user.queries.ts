@@ -18,7 +18,10 @@ export function useUsersQuery(
             queryKey: ['users', currentSearch, currentPage, currentLimit],
             queryFn: async () => await userService.fetchAll(currentSearch, currentPage, currentLimit),
             placeholderData: keepPreviousData,
-            staleTime: 60 * 1000,
+            staleTime: 30_000,              // 30 detik cukup untuk admin dashboard
+            gcTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: true,     // tambah ini
+            refetchOnReconnect: true,       // tambah ini
         };
     });
 }
