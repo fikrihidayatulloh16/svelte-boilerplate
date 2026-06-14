@@ -8,7 +8,7 @@ export const userSchema = z.object({
     id: z.string(),
     email: z.string().email(),
     fullName: z.string(),
-    avatar_url: z.string(),
+    avatar_url: z.string().nullable().optional().default(""),
     isActive: z.boolean(),
     createdAt: z.date(), // Kita ubah string ISO dari API jadi objek Date asli
     updated_at: z.date(), // Kita ubah string ISO dari API jadi objek Date asli

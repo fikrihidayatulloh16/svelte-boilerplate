@@ -3,31 +3,36 @@ import { userGrpcClient } from "./user.grpcClient";
 import { userSchema, type UserEntity } from "../schema/user.schema";
 
 export const userService = {
-    // Tambahkan parameter limit di sini
     async fetchAll(search: string, page: number, limit: number) {
         try {
-            const res = await userGrpcClient.getUsers({ search, page, limit });
+            // 1. Tembak SvelteKit Internal API, BUKAN server Rust!
+            const params = new URLSearchParams({ search, page: String(page), limit: String(limit) });
+            const res = await fetch(`/api/users?${params.toString()}`);
 
-            // Mapping cerdas dengan Zod tetap berjalan
-            const items: UserEntity[] = res.users.map((u) => {
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Gagal mengambil data user");
+            }
+
+            const data = await res.json();
+
+            // 2. Mapping Cerdas dengan Zod (Anti-Corruption Layer)
+            const items: UserEntity[] = data.users.map((u: any) => {
                 return userSchema.parse({
                     id: u.id,
                     email: u.email,
                     fullName: u.fullName,
-                    avatar_url: u.avatarUrl,
+                    // Pastikan penamaan field sesuai dengan JSON yang dihasilkan SvelteKit
+                    avatar_url: u.avatarUrl || u.avatar_url, 
                     isActive: u.isActive,
-                    createdAt: new Date(u.createdAt),
-                    updated_at: new Date(u.updatedAt)
+                    createdAt: new Date(u.createdAt || Date.now()),
+                    updated_at: new Date(u.updatedAt || Date.now())
                 });
             });
 
-            console.log(res);
-            
-
-            // Pastikan Anda membalikkan items (bukan res.users mentah)
-            return { items, total: Number(res.totalCount) };
+            return { items, total: data.total };
         } catch (error) {
-            console.error("🚨 GAGAL DI SERVICE LAYER:", error);
+            console.error("🚨 GAGAL DI SERVICE LAYER UI:", error);
             throw error; 
         }
     }
