@@ -25,46 +25,23 @@ export const errorInterceptor: Interceptor = (next) => async (req) => {
     try {
         return await next(req);
     } catch (err: any) {
-        // 1. Ekstrak pesan dengan fallback yang aman
-        const errorMessage = err.message || "Terjadi kesalahan pada koneksi API.";
-
-        // 2. Logging di terminal server (untuk debugging)
         if (!browser) {
             console.error(`[gRPC Server Error] ${req.service.typeName}.${req.method.name}:`, err);
+            throw err;
         }
 
-        // 3. Logika UI (Hanya dijalankan di Browser)
-        if (browser) {
-            switch (err.code) {
-                case Code.Unauthenticated: // Kode 16
-                    toast.error("Sesi habis, mengalihkan ke login...");
-                    // Gunakan goto agar navigasi halus (SPA), bukan window.location
-                    setTimeout(() => goto('/auth/login'), 1500);
-                    break;
-
-                case Code.PermissionDenied: // Kode 7
-                    toast.error("Anda tidak memiliki izin untuk aksi ini.");
-                    break;
-
-                case Code.InvalidArgument: // Kode 3
-                    toast.warning(`Data tidak valid: ${errorMessage}`);
-                    break;
-
-                case Code.NotFound: // Kode 5
-                    toast.error("Data tidak ditemukan.");
-                    break;
-
-                default:
-                    // Jangan tampilkan toast jika ini error pembatalan request (Canceled)
-                    if (err.code !== Code.Canceled) {
-                        toast.error(`Sistem Error: ${errorMessage}`);
-                    }
-                    break;
-            }
+        // Alih-alih memanggil toast langsung, kita gunakan CustomEvent browser.
+        // Ini membuat layer jaringan terlepas sepenuhnya (decoupled) dari pustaka UI apa pun.
+        if (browser && err instanceof ConnectError) {
+            const event = new CustomEvent("app:api-error", {
+                detail: {
+                    code: err.code,
+                    message: err.rawMessage || "Terjadi kesalahan pada koneksi API."
+                }
+            });
+            window.dispatchEvent(event);
         }
 
-        // 4. Lemparkan kembali agar server-side logic (+page.server.ts) 
-        // tetap bisa menangkap error ini (misal untuk return fail(400))
         throw err;
     }
 };

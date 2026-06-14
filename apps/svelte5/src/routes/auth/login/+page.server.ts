@@ -2,39 +2,54 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { loginSchema } from '$lib/features/auth/auth.schema'; 
+import { loginSchema, type LoginFormData } from '$lib/features/auth/auth.schema'; 
 import { authService } from '$lib/features/auth/api/auth.service';
 import { dev } from '$app/environment'; 
 
-// 1. Export the load function correctly
 export const load = async () => {
-    // Force the type cast to any if the adapter is complaining due to version mismatch
+    // 1. Kembalikan as any untuk membungkam konflik versi Zod vs Superforms
     const form = await superValidate(zod(loginSchema as any));
     return { form };
 };
 
 export const actions = {
     login: async ({ request, cookies }) => {
-        // Force the type cast here as well
+        // 2. Kembalikan as any di sini juga
         const form = await superValidate(request, zod(loginSchema as any));
 
         if (!form.valid) {
             return fail(400, { form });
         }
 
+        // ==========================================
+        // THE NINJA CAST (DOUBLE CASTING)
+        // ==========================================
+        // Paksa TypeScript mengubah objek kosong '{}' menjadi 'unknown' dulu, 
+        // baru kemudian dicetak menjadi LoginFormData. Ini dijamin tidak akan error.
+        const formData = form.data as unknown as LoginFormData;
+
         try {
-            // Note: because we used 'as any' above, we might need to explicitly 
-            // type the argument here if TS complains about Record<string, unknown>
             const response = await authService.login({
-                email: form.data.email as string,
-                password: form.data.password as string
+                // 3. Sekarang TypeScript mengenali formData.email dan formData.password!
+                email: formData.email,
+                password: formData.password
             });
 
+            // Simpan Session Token (misal 15 menit)
             cookies.set('session_token', response.sessionToken, {
                 path: '/',
-                httpOnly: false,
+                httpOnly: true, 
                 sameSite: 'lax',
-                secure: false,
+                secure: !dev,
+                maxAge: 60 * 15 
+            });
+
+            // Simpan Refresh Token (misal 7 hari)
+            cookies.set('refresh_token', response.refreshToken, {
+                path: '/',
+                httpOnly: true, 
+                sameSite: 'lax',
+                secure: !dev,
                 maxAge: 60 * 60 * 24 * 7 
             });
 

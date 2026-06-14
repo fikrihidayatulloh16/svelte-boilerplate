@@ -125,7 +125,8 @@ Jangan menulis kode frontend sebelum ada kontrak yang jelas dengan backend.
 
 2. Generate tipe data TypeScript dengan menjalankan perintah di terminal(pastikan sedang di apps/svelte5):
 ```Bash
-npx buf generate
+npm run generate
+#npx buf generate
 ```
 
 #### 1. Create The Client & Mock (api/client.ts & api/mock.ts)

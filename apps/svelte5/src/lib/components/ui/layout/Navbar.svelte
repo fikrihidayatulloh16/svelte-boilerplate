@@ -25,6 +25,9 @@
             queryClient.clear();
 
             // 3. Tendang pengguna kembali ke halaman login
+            window.location.href = '/auth/login'; // Paksa muat ulang agar hooks.server.ts me-reset state
+
+            // ####### backup jika goto lebih tepat ######
             goto('/auth/login');
         } catch (error) {
             console.error("Logout gagal:", error);

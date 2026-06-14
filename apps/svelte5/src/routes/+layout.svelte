@@ -13,6 +13,8 @@
     // import { beforeNavigate, afterNavigate } from '$app/navigation'; 
     import { untrack } from 'svelte';
     import { navigating } from '$app/state';
+    import { goto } from '$app/navigation';
+    import { Code } from '@connectrpc/connect';
 
 	let { data, children } = $props<{ data: LayoutData, children: any }>();
 
@@ -65,14 +67,29 @@
         }
 
         // Mendengarkan semua teriakan error dari REST, gRPC, atau komponen apapun
-        const handleAppError = (e: Event) => {
-            const customEvent = e as CustomEvent;
-            toast.error(customEvent.detail || 'Terjadi kesalahan jaringan.');
+        const handleApiError = (e: Event) => {
+            const { code, message } = (e as CustomEvent).detail;
+            
+            switch (code) {
+                case Code.Unauthenticated:
+                    toast.error("Sesi habis, mengalihkan ke login...");
+                    setTimeout(() => goto('/auth/login'), 1500);
+                    break;
+                case Code.PermissionDenied:
+                    toast.error("Anda tidak memiliki izin untuk aksi ini.");
+                    break;
+                case Code.InvalidArgument:
+                    toast.warning(`Data tidak valid: ${message}`);
+                    break;
+                default:
+                    toast.error(`Sistem Error: ${message}`);
+                    break;
+            }
         };
 
-        window.addEventListener('app:error', handleAppError);
+        window.addEventListener('app:error', handleApiError);
 
-        return () => window.removeEventListener('app:error', handleAppError);
+        return () => window.removeEventListener('app:error', handleApiError);
     });
 </script>
 

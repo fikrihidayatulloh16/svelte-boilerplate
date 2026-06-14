@@ -2,33 +2,31 @@ import { redirect } from '@sveltejs/kit';
 import { authClient } from '$lib/features/auth/api/auth.grpcClient';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { authService } from '$lib/features/auth/api/auth.service';
+import { createServerAuthClient } from '$lib/shared/server/grpc-client';
 
 export const POST: RequestHandler = async ({ cookies, fetch }) => {
-    // 1. Ambil token sebelum dihancurkan
-    const token = cookies.get('session_token');
+    // 1. Ekstrak Refresh Token dari brankas HttpOnly
+    const refreshToken = cookies.get('refresh_token');
+    const sessionToken = cookies.get('session_token') || '';
 
-    if (token) {
+    if (refreshToken) {
         try {
-            // 2. Beritahu Rust Backend untuk mem-blacklist token ini.
-            // Anda bisa menggunakan REST fetch (seperti yang Anda tes) atau gRPC Client.
-            // Contoh menggunakan REST Fetch:
-            await fetch('http://localhost:3000/api/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-        } catch (err) {
-            console.error("Gagal mem-blacklist token di server Rust:", err);
-            // Tetap lanjutkan penghapusan cookie meskipun backend gagal dihubungi
+            // 2. Beritahu server Rust untuk mem-blacklist token ini di Redis
+            const authGrpc = createServerAuthClient(sessionToken);
+            await authGrpc.logout({ refreshToken });
+        } catch (error) {
+            // Meskipun server Rust gagal merespons, kita TETAP harus menghapus sesi lokal
+            console.error("🚨 Gagal mem-blacklist token di Backend, melanjutkan penghapusan sesi lokal.", error);
         }
     }
 
     // 3. KUNCI UTAMA: Hancurkan cookie di browser pengguna!
     cookies.delete('session_token', { path: '/' });
+    cookies.delete('refresh_token', { path: '/' });
 
     // 4. Kembalikan respons sukses ke UI
-        return json({ success: true });
+        return json({ success: true, message: "Berhasil keluar dari sistem" });
         
         // throw redirect(303, '/auth/login');
 };

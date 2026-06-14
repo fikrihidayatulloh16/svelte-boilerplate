@@ -12,6 +12,9 @@ service AuthService {
 
   // Logout pengguna (Hapus token di sisi server/redis jika perlu)
   rpc Logout (LogoutRequest) returns (LogoutResponse);
+
+  // Refresh Token
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
 }
 
 // ==========================================
@@ -39,19 +42,33 @@ message LoginRequest {
 
 message LoginResponse {
   string session_token = 1;
-  UserResponse user = 2;
+  string refresh_token  = 2;
+  UserResponse user = 3;
 }
 
 // ==========================================
 // LOGOUT
 // ==========================================
 message LogoutRequest {
-  // Kosong. Token diambil dari Metadata/Header HTTP oleh Interceptor Rust
+  string refresh_token = 1;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
 }
 
 message LogoutResponse {
   bool success = 1;
 }
+
+// ==========================================
+// Refresh Token
+// ==========================================
 
 // ==========================================
 // ENTITAS BERSAMA (SHARED)
@@ -62,4 +79,5 @@ message UserResponse {
   string email = 2;
   string full_name = 3;
   string role = 4;
+  
 }

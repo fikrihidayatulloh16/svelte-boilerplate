@@ -3,34 +3,58 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import type { HandleServerError } from '@sveltejs/kit';
 import { authService } from '$lib/features/auth/api/auth.service';
+import { createServerGrpcClient } from '$lib/shared/server/grpc-client';
 
 const authHandler: Handle = async ({ event, resolve }) => {
-    const token = event.cookies.get('session_token');
+    let sessionToken = event.cookies.get('session_token');
+    const refreshToken = event.cookies.get('refresh_token');
 
-    if (token) {
+    // SKENARIO 1: Token Sesi Expired / Tidak Ada, TAPI Refresh Token Ada
+    if (!sessionToken && refreshToken) {
         try {
-            // Trik Ninja: Decode JWT Payload tanpa library tambahan (hanya base64 decode)
-            const payloadBase64 = token.split('.')[1];
-            // Tambahkan padding '=' jika kurang, untuk mencegah error atob
-            const paddedBase64 = payloadBase64.padEnd(payloadBase64.length + (4 - payloadBase64.length % 4) % 4, '=');
+            // Lakukan Silent Refresh ke Backend Rust
+            const newTokens = await authService.refreshSession(refreshToken);
             
+            // Perbarui cookie Sesi SvelteKit
+            event.cookies.set('session_token', newTokens.sessionToken, {
+                path: '/', httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 15
+            });
+            event.cookies.set('refresh_token', newTokens.refreshToken, {
+                path: '/', httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 60 * 24 * 7
+            });
+            
+            // Gunakan token baru untuk request ini
+            sessionToken = newTokens.sessionToken;
+        } catch (error) {
+            // Refresh token gagal (mungkin diblacklist/expired dari server Rust)
+            console.error("🚨 Silent Refresh Gagal, menghapus sesi...");
+            event.cookies.delete('session_token', { path: '/' });
+            event.cookies.delete('refresh_token', { path: '/' });
+            sessionToken = undefined;
+        }
+    }
+
+    // SKENARIO 2: Validasi & Ekstrak Data dari Session Token yang hidup
+    if (sessionToken) {
+        try {
+            const payloadBase64 = sessionToken.split('.')[1];
+            const paddedBase64 = payloadBase64.padEnd(payloadBase64.length + (4 - payloadBase64.length % 4) % 4, '=');
             const payload = JSON.parse(Buffer.from(paddedBase64, 'base64').toString('utf-8'));
 
-            // Cek apakah token sudah expired
+            // Trik Ninja Validasi Lokal
             if (Date.now() >= payload.exp * 1000) {
-                throw new Error("Token expired");
+                // Sengaja lempar error jika masih tembus (meski harusnya sudah ditangani Skenario 1)
+                throw new Error("Token expired lokal"); 
             }
 
-            // Masukkan ke locals agar bisa dipakai di semua halaman Svelte!
             event.locals.user = {
                 id: payload.sub,
                 email: payload.email,
                 role: payload.role,
-                // fullName tidak ada di JWT log Anda, bisa dikosongkan atau ditambahkan di Rust nanti
-                fullName: 'User' 
+                fullName: payload.fullName || 'User' 
             };
         } catch (err) {
-            console.error("🚨 Token Invalid / Expired, menghapus sesi...");
+            // Fallback jika decode gagal atau token korup
             event.cookies.delete('session_token', { path: '/' });
             event.locals.user = null;
         }
