@@ -1,8 +1,9 @@
 // apps/svelte5/src/hooks.server.ts
-import { redirect, type Handle } from '@sveltejs/kit';
+import { error as svelteError, redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import type { HandleServerError } from '@sveltejs/kit';
 import { authService } from '$lib/features/auth/api/auth.service';
+import { NetworkUnavailableError, AuthenticationError } from '$lib/features/auth/api/auth.adapter'; // <-- Import Error Kustom
 import { createServerGrpcClient } from '$lib/shared/server/grpc-client';
 
 const authHandler: Handle = async ({ event, resolve }) => {
@@ -12,10 +13,8 @@ const authHandler: Handle = async ({ event, resolve }) => {
     // SKENARIO 1: Token Sesi Expired / Tidak Ada, TAPI Refresh Token Ada
     if (!sessionToken && refreshToken) {
         try {
-            // Lakukan Silent Refresh ke Backend Rust
             const newTokens = await authService.refreshSession(refreshToken);
             
-            // Perbarui cookie Sesi SvelteKit
             event.cookies.set('session_token', newTokens.sessionToken, {
                 path: '/', httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 15
             });
@@ -23,11 +22,22 @@ const authHandler: Handle = async ({ event, resolve }) => {
                 path: '/', httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 60 * 24 * 7
             });
             
-            // Gunakan token baru untuk request ini
             sessionToken = newTokens.sessionToken;
-        } catch (error) {
-            // Refresh token gagal (mungkin diblacklist/expired dari server Rust)
-            console.error("🚨 Silent Refresh Gagal, menghapus sesi...");
+        } catch (err) {
+            // DETEKSI CERDAS BERDASARKAN DOMAIN ERROR
+            if (err instanceof NetworkUnavailableError) {
+                console.error("🚧 Backend Rust sedang down. Sesi lokal DIPERTAHANKAN.");
+                // Lempar 503 langsung. Proses berhenti di sini, layout Svelte akan memunculkan halaman error.
+                throw svelteError(503, "Layanan otentikasi sedang tidak tersedia. Silakan muat ulang halaman sebentar lagi.");
+            }
+
+            if (err instanceof AuthenticationError) {
+                console.warn("🚨 Token invalid/ditolak Rust. Menghapus sesi lokal...");
+            } else {
+                console.error("🚨 Silent Refresh Gagal oleh sebab tak terduga, menghapus sesi...", err);
+            }
+
+            // Sapu bersih sesi lokal (Kebijakan Bumi Hangus HANYA jika bukan karena jaringan putus)
             event.cookies.delete('session_token', { path: '/' });
             event.cookies.delete('refresh_token', { path: '/' });
             sessionToken = undefined;

@@ -1,8 +1,16 @@
 // apps/svelte5/src/lib/features/auth/api/auth.adapter.ts
 import { realClient } from "./auth.grpcClient";
 import type { LoginFormData } from "../auth.schema";
-import { ConnectError } from "@connectrpc/connect";
+import { ConnectError, Code } from "@connectrpc/connect";
 import { PUBLIC_USE_MOCK } from '$env/static/public';
+
+// --- CUSTOM DOMAIN ERRORS ---
+export class NetworkUnavailableError extends Error {
+    constructor(message: string) { super(message); this.name = "NetworkUnavailableError"; }
+}
+export class AuthenticationError extends Error {
+    constructor(message: string) { super(message); this.name = "AuthenticationError"; }
+}
 
 // 1. KONTRAK PORT (Inilah yang membuat Service jadi buta)
 export interface IAuthPort {
@@ -18,9 +26,22 @@ export interface IAuthPort {
 // 2. ERROR TRANSLATOR (Mencegah gRPC bocor ke Service)
 function translateError(error: unknown, defaultMessage: string): never {
     if (error instanceof ConnectError) {
+        // Rust mati atau jaringan putus
+        if (error.code === Code.Unavailable || error.code === Code.DeadlineExceeded) {
+            throw new NetworkUnavailableError("Peladen backend tidak dapat dihubungi.");
+        }
+        // Token salah, basi, atau ditolak
+        if (error.code === Code.Unauthenticated || error.code === Code.InvalidArgument) {
+            throw new AuthenticationError(error.rawMessage || "Sesi otentikasi tidak valid.");
+        }
         throw new Error(error.rawMessage || defaultMessage);
     }
-    // Jika nanti Anda ganti ke REST/Axios, Anda cukup tambah deteksi AxiosError di sini!
+    
+    // Tangkapan layar untuk Fetch API / Undici bawaan Node.js yang gagal nyambung
+    if (error instanceof Error && (error.message.includes('ECONNREFUSED') || error.message.includes('fetch failed'))) {
+        throw new NetworkUnavailableError("Gagal koneksi fisik ke peladen.");
+    }
+
     throw new Error(defaultMessage);
 }
 

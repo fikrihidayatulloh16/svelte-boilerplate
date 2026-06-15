@@ -5,6 +5,7 @@ import { userSchema, type UserEntity } from "../schema/user.schema";
 export const userService = {
     async fetchAll(search: string, page: number, limit: number) {
         try {
+
             // 1. Tembak SvelteKit Internal API, BUKAN server Rust!
             const params = new URLSearchParams({ search, page: String(page), limit: String(limit) });
             const res = await fetch(`/api/users?${params.toString()}`);
